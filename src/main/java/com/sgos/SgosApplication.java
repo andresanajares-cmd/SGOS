@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SgosApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SgosApplication.class, args);
+		SpringApplication.run(SgosApplication.class, args);	
 	}
 
 }
