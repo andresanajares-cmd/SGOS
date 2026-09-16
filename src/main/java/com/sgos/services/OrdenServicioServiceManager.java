@@ -31,8 +31,18 @@ public class OrdenServicioServiceManager implements OrdenServicioService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        this.repository.deleteById(id);
+    public OrdenServicio update(Long id, OrdenServicio ordenServicio) {
+        OrdenServicio orden = this.repository.findById(id).get();
+
+        orden.setCliente(ordenServicio.getCliente());
+        orden.setDescripcion(ordenServicio.getDescripcion());
+        orden.setFecha(ordenServicio.getFecha());
+        orden.setEstado(ordenServicio.getEstado());
+        orden.setResponsable(ordenServicio.getResponsable());
+
+        return this.repository.save(orden);
     }
+
+
     
 }

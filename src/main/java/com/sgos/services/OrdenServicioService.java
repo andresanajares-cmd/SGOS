@@ -7,5 +7,6 @@ public interface OrdenServicioService {
     List<OrdenServicio> findAll();
     OrdenServicio findById(Long id);
     OrdenServicio save(OrdenServicio ordenServicio);
-    void deleteById(Long id);
+    OrdenServicio update(Long id, OrdenServicio ordenServicio);
+
 }
