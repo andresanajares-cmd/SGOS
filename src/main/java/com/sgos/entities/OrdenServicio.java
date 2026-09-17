@@ -7,11 +7,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table; 
 
+//Clase Ordenes servicios, que representa una orden de servicio en el sistema. 
+// Contiene atributos como id, descripcion, fecha, estado, cliente y responsable (columnas de la tabla en la base de datos). 
+
+
+// Se utiliza la anotación @Entity para indicar que es una entidad de JPA 
 @Entity
+
+// @Table para especificar el nombre de la tabla en la base de datos.
 @Table(name = "ordenes_servicios")
+
 public class OrdenServicio {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+
+    @Id //Pk - Primary Key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //Generación automática del valor de la PK.
     private Long id;
 
     private String descripcion;
@@ -20,6 +29,7 @@ public class OrdenServicio {
     private String cliente;
     private String responsable;
 
+    //Contructor vacio (necesario por el framework) y constructor con parámetros para inicializar los atributos de la clase.
     public OrdenServicio() {
     }
 
@@ -30,6 +40,9 @@ public class OrdenServicio {
         this.cliente = cliente;
         this.responsable = responsable;
     }
+
+
+    //Getters y Setters para acceder y modificar los atributos de la clase.
 
     public Long getId() {
         return id;

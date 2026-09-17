@@ -9,11 +9,14 @@ import com.sgos.entities.OrdenServicio;
 import com.sgos.repositories.OrdenServicioRepository;
 
 
-@Service
+@Service //Decorador de spring para guardar la logica de la aplicacion. 
+// en este caso la logica de negocio de la entidad OrdenServicio
 public class OrdenServicioServiceManager implements OrdenServicioService {
     
+
     @Autowired 
-    private OrdenServicioRepository repository;
+    private OrdenServicioRepository repository; //Inyeccion de dependencias para acceder a los metodos del repositorio de la entidad OrdenServicio. 
+
 
     @Override 
     public List<OrdenServicio> findAll() {
@@ -32,7 +35,8 @@ public class OrdenServicioServiceManager implements OrdenServicioService {
 
     @Override
     public OrdenServicio update(Long id, OrdenServicio ordenServicio) {
-        OrdenServicio orden = this.repository.findById(id).get();
+        OrdenServicio orden = this.repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Orden de servicio no encontrada con id: " + id));
 
         orden.setCliente(ordenServicio.getCliente());
         orden.setDescripcion(ordenServicio.getDescripcion());
@@ -41,6 +45,13 @@ public class OrdenServicioServiceManager implements OrdenServicioService {
         orden.setResponsable(ordenServicio.getResponsable());
 
         return this.repository.save(orden);
+    }
+
+    @Override
+    public void delete(Long id) {
+        OrdenServicio orden = this.repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Orden de servicio no encontrada con id: " + id));
+        this.repository.delete(orden);
     }
 
 
