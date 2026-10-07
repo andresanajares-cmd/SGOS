@@ -31,7 +31,10 @@ public class OrdenServicioController {
     @Autowired
     private OrdenServicioServiceManager serviceManager;
 
+
+    
     @GetMapping()
+    //
     @Transactional(readOnly = true)
 
     //Buscar todas las ordenes de servicio
