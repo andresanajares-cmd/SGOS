@@ -1,35 +1,34 @@
 package com.sgos.entities;
 
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table; 
-
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuarios")
 
 public class Usuarios {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true, length = 50)
     private String nombre;
-    private String correo;
-    private String contrasena;
 
+    @Column(nullable = false)
+    private String contrasena;
 
     public Usuarios() {
     }
 
-    public Usuarios(String nombre, String correo, String contrasena) {
+    public Usuarios(String nombre, String contrasena) {
         this.nombre = nombre;
-        this.correo = correo;
         this.contrasena = contrasena;
-        
+
     }
 
     public Long getId() {
@@ -48,14 +47,6 @@ public class Usuarios {
         this.nombre = nombre;
     }
 
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
     public String getContrasena() {
         return contrasena;
     }
@@ -63,7 +54,5 @@ public class Usuarios {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-
-
 
 }
