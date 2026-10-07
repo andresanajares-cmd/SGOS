@@ -8,5 +8,5 @@ import com.sgos.entities.Usuarios;
 //patrón de diseño llamado Repository combinado 
 public interface UsuariosRepository extends JpaRepository<Usuarios, Long> {
     // Método para buscar un usuario por su nombre de usuario
-    Optional<Usuarios> findByUsername(String username);
+    Optional<Usuarios> findBynombre(String nombre);
 }

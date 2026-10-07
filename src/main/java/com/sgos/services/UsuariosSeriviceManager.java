@@ -25,7 +25,7 @@ public class UsuariosSeriviceManager implements UsuariosService {
     @Override
     public boolean authenticateUser(String nombre, String contrasena) {
         // Busca el usuario por su nombre de usuario en la base de datos
-        Optional<Usuarios> usuarioEncontrado = repository.findByUsername(nombre);
+        Optional<Usuarios> usuarioEncontrado = repository.findBynombre(nombre);
 
         if (usuarioEncontrado.isEmpty()) {
             return false;
