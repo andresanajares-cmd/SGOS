@@ -14,6 +14,7 @@ const ordenServicioApi = {
    * Obtiene todas las órdenes de servicio registradas.
    * @returns {Promise<Array>} lista de órdenes
    */
+  
   getAll: async () => {
     const respuesta = await axios.get(BASE_URL);
     return respuesta.data;
@@ -52,7 +53,6 @@ const ordenServicioApi = {
 
   /**
    * Elimina una orden de servicio por su id.
-   * Requiere que el backend tenga el endpoint DELETE implementado.
    * @param {number|string} id
    */
   remove: async (id) => {
