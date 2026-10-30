@@ -15,7 +15,7 @@ import com.sgos.repositories.UsuariosRepository;
 public class UsuariosSeriviceManager implements UsuariosService {
 
     @Autowired 
-    private UsuariosRepository repository; //Inyeccion de dependencias para acceder a los metodos del repositorio de la entidad OrdenServicio. 
+    private UsuariosRepository repository; //Inyeccion de dependencias para acceder a los metodos del repositorio de la entidad. 
 
     @Override
     public Usuarios registerUser(Usuarios usuario) {
