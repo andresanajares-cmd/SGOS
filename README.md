@@ -1,32 +1,66 @@
-# SGOS - Sistema Gestor de Órdenes de Servicio
+# SGOS - Servicio web de registro e inicio de sesión
 
-Este proyecto es el módulo de órdenes de servicio de mi sistema SGOS. Ojo: **no es el sistema completo**, solo este módulo, que es lo que se pide en la evidencia GA7-220501096-AA3-EV01.
+Este proyecto es parte de mi sistema SGOS (Sistema Gestor de Órdenes de Servicio). En esta entrega, evidencia GA7-220501096-AA5-EV01, lo que se presenta es el **servicio web de registro e inicio de sesión de usuarios**, hecho con Spring Boot.
 
-Con él se pueden crear, ver, editar y eliminar órdenes de servicio. El backend lo hice con Spring Boot y el frontend con React.
+Ojo: **no es el sistema completo**. El proyecto también tiene el módulo de órdenes de servicio, que lo entregué en otra evidencia (AA3-EV01).
 
-## Qué hace
+## Qué hace el servicio
 
-- Crear una orden
-- Ver todas las órdenes
-- Buscar una orden por su id
-- Editar una orden
-- Eliminar una orden
+El servicio recibe un usuario y una contraseña:
 
-Cada orden tiene:
-
-- **id**: se genera solo
-- **fecha**
-- **responsable**: quién se encarga de la orden
-- **cliente**
-- **descripcion**: qué hay que hacer
-- **estado**: por ejemplo Pendiente, En proceso o Finalizada
+- **Registro:** guarda el usuario en la base de datos.
+- **Inicio de sesión:** revisa si el usuario y la contraseña son correctos.
+  - Si son correctos, responde "Autenticación satisfactoria".
+  - Si no, responde "Error en la autenticación".
 
 ## Con qué lo hice
 
-- Backend: Java 17, Spring Boot 3, Maven
-- Frontend: React con Vite
-- Base de datos: MySQL (la manejé con MySQL Workbench)
-- Versionamiento: Git y GitHub
+- Java 17, Spring Boot 3, Maven
+- MySQL (con MySQL Workbench)
+- Git y GitHub
+
+## Rutas del servicio
+
+Todas empiezan por `http://localhost:8080/api/usuarios`
+
+| Método | Ruta | Para qué sirve |
+|--------|------|----------------|
+| POST | `/api/usuarios/registro` | Registra un usuario nuevo |
+| POST | `/api/usuarios/login` | Inicia sesión |
+
+### Registro
+
+Se envía el usuario y la contraseña en el cuerpo de la petición:
+
+```json
+{
+  "nombre": "andres",
+  "contrasena": "1234"
+}
+```
+
+Responde `200 OK` con el usuario que quedó guardado.
+
+### Inicio de sesión
+
+Se envía lo mismo:
+
+```json
+{
+  "nombre": "andres",
+  "contrasena": "1234"
+}
+```
+
+Si los datos son correctos:
+
+- Código: `200 OK`
+- Mensaje: `Autenticación satisfactoria`
+
+Si el usuario no existe o la contraseña está mal:
+
+- Código: `401 Unauthorized`
+- Mensaje: `Error en la autenticación`
 
 ## Cómo está organizado
 
@@ -38,13 +72,16 @@ SGOS/
 └── README.md
 ```
 
-En el backend separé el código por capas: los **controllers** reciben las peticiones, los **services** tienen la lógica, los **repositories** hablan con la base de datos y las **entities** son las clases que representan las tablas.
+El servicio de usuarios usa las mismas capas que el resto del backend:
 
-En el frontend, dentro de `frontend/frontend-ordenes/src`, los **components** son las pantallas y piezas de la interfaz, y **services** es donde se hacen las llamadas a la API.
+- **UsuarioController:** recibe las peticiones de registro y login.
+- **UsuariosSeriviceManager:** tiene la lógica para guardar el usuario y verificar las credenciales.
+- **UsuariosRepository:** consulta la base de datos.
+- **Usuarios:** la clase que representa la tabla de usuarios.
 
 ## Cómo correrlo
 
-Necesitas tener instalado Java 17 o más, Node.js, MySQL y Git.
+Necesitas tener instalado Java 17 o más, MySQL y Git.
 
 **1. Clonar el repositorio**
 
@@ -80,49 +117,17 @@ Las tablas se crean solas la primera vez que se corre el backend.
 
 (en Windows: `mvnw.cmd spring-boot:run`). Queda en `http://localhost:8080`.
 
-**4. Correr el frontend**
+## Cómo probarlo
 
-En otra terminal:
+Se puede probar con Postman o cualquier programa parecido:
 
-```bash
-cd frontend/frontend-ordenes
-npm install
-npm run dev
-```
-
-Queda en `http://localhost:5173`.
-
-## Rutas de la API
-
-Todas empiezan por `http://localhost:8080/api/ordenesservicios`
-
-| Método | Ruta | Para qué sirve |
-|--------|------|----------------|
-| GET | `/api/ordenesservicios` | Trae todas las órdenes |
-| GET | `/api/ordenesservicios/{id}` | Trae una orden por id (404 si no existe) |
-| POST | `/api/ordenesservicios` | Crea una orden |
-| PUT | `/api/ordenesservicios/{id}` | Edita una orden (404 si no existe) |
-| DELETE | `/api/ordenesservicios/{id}` | Elimina una orden (404 si no existe) |
-
-Ejemplo de lo que se manda para crear o editar una orden:
-
-```json
-{
-  "fecha": "2025-01-15",
-  "responsable": "Carlos Gómez",
-  "cliente": "Empresa XYZ",
-  "descripcion": "Mantenimiento preventivo de equipos",
-  "estado": "Pendiente"
-}
-```
-
-## Cosas que tener en cuenta
-
-En el proyecto también hay código de usuarios y login. Eso es de otra evidencia y no hace parte de esta entrega, pero lo dejé ahí para no dañar nada.
+1. Hacer un `POST` a `http://localhost:8080/api/usuarios/registro` con el JSON de arriba.
+2. Hacer un `POST` a `http://localhost:8080/api/usuarios/login` con el mismo JSON. Debe salir "Autenticación satisfactoria".
+3. Repetir el login con una contraseña distinta. Debe salir "Error en la autenticación" con código 401.
 
 ## Autor
 
-Andres Sebastian Anajar Gonzalez
+Andrés Sebastián Anajar González
 Análisis y Desarrollo de Software, ficha 3186597 - SENA
 
 Repositorio: https://github.com/andresanajares-cmd/SGOS
