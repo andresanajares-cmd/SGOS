@@ -59,32 +59,54 @@ function FormularioUsuario({ onLoginExitoso }) {
   };
 
   return (
-    <form onSubmit={manejarSubmit}>
-      <h2>{modoRegistro ? "Registrarse" : "Iniciar sesión"}</h2>
+     // Centra la tarjeta en pantalla
+  <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+    <form
+      onSubmit={manejarSubmit}
+      className="card shadow-sm p-4 w-100"
+      style={{ maxWidth: 400 }}
+    >
+      <h2 className="h4 text-center mb-4">
+        {modoRegistro ? "Registrarse" : "Iniciar sesión"}
+      </h2>
 
-      <input
-        placeholder="Usuario"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={contrasena}
-        onChange={(e) => setContrasena(e.target.value)}
-        required
-      />
+      <div className="mb-3">
+        <label className="form-label">Usuario</label>
+        <input
+          className="form-control"
+          placeholder="Usuario"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
+      </div>
 
-      <button type="submit">
+      <div className="mb-3">
+        <label className="form-label">Contraseña</label>
+        <input
+          type="password"
+          className="form-control"
+          placeholder="Contraseña"
+          value={contrasena}
+          onChange={(e) => setContrasena(e.target.value)}
+          required
+        />
+      </div>
+
+      <button type="submit" className="btn btn-primary w-100 mb-2">
         {modoRegistro ? "Registrarme" : "Ingresar"}
       </button>
 
       {/* Alterna entre login y registro */}
-      <button type="button" onClick={() => setModoRegistro(!modoRegistro)}>
+      <button
+        type="button"
+        className="btn btn-link w-100"
+        onClick={() => setModoRegistro(!modoRegistro)}
+      >
         {modoRegistro ? "Ya tengo cuenta" : "Crear cuenta nueva"}
       </button>
     </form>
+  </div>
   );
 }
 
