@@ -39,6 +39,12 @@
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
+<!-- Validación de tokens JWT -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+        </dependency>
+
         <!-- Seguridad y autenticación -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
