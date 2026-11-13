@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sgos.dto.CrearUsuarioRequest;
 import com.sgos.dto.LoginRequest;
 import com.sgos.dto.LoginResponse;
+import com.sgos.dto.UsuarioResponse;
 import com.sgos.entities.Usuarios;
 import com.sgos.repositories.UsuariosRepository;
 import com.sgos.security.JwtService;
 import com.sgos.services.UsuariosSeriviceManager;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -31,29 +35,35 @@ public class UsuarioController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/registro")
-    public ResponseEntity<?> registro(@RequestBody Usuarios usuario) {
 
-        try {
-            Usuarios nuevoUsuario =
-                usuarioService.registerUser(usuario);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                Map.of(
-                    "mensaje", "Usuario registrado correctamente",
-                    "id", nuevoUsuario.getId(),
-                    "nombre", nuevoUsuario.getNombre(),
-                    "correo", nuevoUsuario.getCorreo(),
-                    "rol", nuevoUsuario.getRol().getNombre()
-                )
-            );
+@PostMapping
+public ResponseEntity<?> crearTecnico(
+        @Valid @RequestBody CrearUsuarioRequest request) {
 
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                Map.of("error", e.getMessage())
-            );
-        }
+    try {
+        Usuarios usuario = usuarioService.crearTecnico(request);
+
+        UsuarioResponse respuesta = new UsuarioResponse(
+            usuario.getId(),
+            usuario.getNombre(),
+            usuario.getCorreo(),
+            usuario.getTelefono(),
+            usuario.getRol().getNombre(),
+            usuario.getActivo()
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(respuesta);
+
+    } catch (IllegalArgumentException e) {
+
+        return ResponseEntity.badRequest().body(
+            Map.of("error", e.getMessage())
+        );
     }
+}
 
     @PostMapping("/login")
     public ResponseEntity<?> login(

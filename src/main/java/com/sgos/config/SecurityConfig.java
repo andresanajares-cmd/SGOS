@@ -1,4 +1,3 @@
-
 package com.sgos.config;
 
 import java.util.List;
@@ -26,42 +25,37 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                // Inicio de sesión público
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/usuarios/login"
-                ).permitAll()
-
-                // Registro temporalmente público
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/usuarios/registro"
-                ).permitAll()
-
-                // Solo administradores pueden eliminar órdenes
-                .requestMatchers(
-                    HttpMethod.DELETE,
-                    "/api/ordenesservicios/**"
-                ).hasRole("ADMINISTRADOR")
-
-                // Administradores y técnicos pueden consultar y crear órdenes
-                .requestMatchers("/api/ordenesservicios/**")
-                    .hasAnyRole("ADMINISTRADOR", "TECNICO")
-
-                // Las demás rutas requieren autenticación
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-            );
+                .authorizeHttpRequests(auth -> auth
+                        // Inicio de sesión público
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/usuarios/login"
+                        ).permitAll()
+                        // Registro temporalmente público
+                        // Solo el administrador puede gestionar usuarios
+                        .requestMatchers("/api/usuarios/**")
+                        .hasRole("ADMINISTRADOR")
+                        // Solo administradores pueden eliminar órdenes
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/ordenesservicios/**"
+                        ).hasRole("ADMINISTRADOR")
+                        // Administradores y técnicos pueden consultar y crear órdenes
+                        .requestMatchers("/api/ordenesservicios/**")
+                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // Las demás rutas requieren autenticación
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                );
 
         return http.build();
     }
@@ -69,8 +63,8 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
 
-        JwtAuthenticationConverter converter =
-            new JwtAuthenticationConverter();
+        JwtAuthenticationConverter converter
+                = new JwtAuthenticationConverter();
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
 
@@ -81,7 +75,7 @@ public class SecurityConfig {
             }
 
             return List.of(
-                new SimpleGrantedAuthority("ROLE_" + rol)
+                    new SimpleGrantedAuthority("ROLE_" + rol)
             );
         });
 
@@ -94,22 +88,22 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "http://localhost:3000"
+                "http://localhost:5173",
+                "http://localhost:3000"
         ));
 
         configuration.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of(
-            "Authorization", "Content-Type"
+                "Authorization", "Content-Type"
         ));
 
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source
+                = new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration("/**", configuration);
 

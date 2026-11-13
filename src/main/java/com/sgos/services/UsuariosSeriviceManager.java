@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.sgos.dto.CrearUsuarioRequest;
 import com.sgos.entities.Rol;
 import com.sgos.entities.Usuarios;
 import com.sgos.repositories.RolRepository;
@@ -76,4 +77,36 @@ public class UsuariosSeriviceManager implements UsuariosService {
             usuario.getContrasena()
         );
     }
+
+@Override
+public Usuarios crearTecnico(CrearUsuarioRequest request) {
+
+    String correo = request.correo().trim().toLowerCase();
+
+    if (repository.existsByCorreo(correo)) {
+        throw new IllegalArgumentException(
+            "El correo ya está registrado"
+        );
+    }
+
+    Rol rolTecnico = rolRepository
+        .findByNombre("TECNICO")
+        .orElseThrow(() -> new IllegalStateException(
+            "No existe el rol TECNICO"
+        ));
+
+    Usuarios usuario = new Usuarios();
+
+    usuario.setNombre(request.nombre().trim());
+    usuario.setCorreo(correo);
+    usuario.setContrasena(
+        passwordEncoder.encode(request.contrasena())
+    );
+    usuario.setTelefono(request.telefono());
+    usuario.setRol(rolTecnico);
+    usuario.setActivo(true);
+
+    return repository.save(usuario);
+}
+
 }
