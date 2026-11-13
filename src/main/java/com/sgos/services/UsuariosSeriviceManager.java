@@ -1,37 +1,79 @@
+
 package com.sgos.services;
 
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.sgos.entities.Rol;
 import com.sgos.entities.Usuarios;
+import com.sgos.repositories.RolRepository;
 import com.sgos.repositories.UsuariosRepository;
-
-
-
 
 @Service
 public class UsuariosSeriviceManager implements UsuariosService {
 
-    @Autowired 
-    private UsuariosRepository repository; //Inyeccion de dependencias para acceder a los metodos del repositorio de la entidad. 
+    @Autowired
+    private UsuariosRepository repository;
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Usuarios registerUser(Usuarios usuario) {
+
+        // Verificar si el correo ya existe
+        if (repository.existsByCorreo(usuario.getCorreo())) {
+            throw new IllegalArgumentException(
+                "El correo ya está registrado"
+            );
+        }
+
+        // Asignar siempre el rol TECNICO en el registro público
+        Rol rol = rolRepository.findByNombre("TECNICO")
+            .orElseThrow(() -> new IllegalStateException(
+                "El rol TECNICO no existe"
+            ));
+
+        usuario.setId(null);
+        usuario.setRol(rol);
+        usuario.setActivo(true);
+
+        // Proteger la contraseña con BCrypt
+        String contrasenaEncriptada =
+            passwordEncoder.encode(usuario.getContrasena());
+
+        usuario.setContrasena(contrasenaEncriptada);
+
+        // Guardar el usuario
         return repository.save(usuario);
     }
-    // Implementación del método de autenticación de usuario
+
     @Override
-    public boolean authenticateUser(String nombre, String contrasena) {
-        // Busca el usuario por su nombre de usuario en la base de datos
-        Optional<Usuarios> usuarioEncontrado = repository.findBynombre(nombre);
+    public boolean authenticateUser(String correo, String contrasena) {
+
+        Optional<Usuarios> usuarioEncontrado =
+            repository.findByCorreo(correo);
 
         if (usuarioEncontrado.isEmpty()) {
             return false;
         }
-        // Compara la contraseña proporcionada con la almacenada en la base de datos
-        return usuarioEncontrado.get().getContrasena().equals(contrasena);
-    }
 
+        Usuarios usuario = usuarioEncontrado.get();
+
+        if (!Boolean.TRUE.equals(usuario.getActivo())) {
+            return false;
+        }
+
+        // Comparar la contraseña con el hash almacenado
+        return passwordEncoder.matches(
+            contrasena,
+            usuario.getContrasena()
+        );
+    }
 }
