@@ -1,4 +1,3 @@
-
 package com.sgos.services;
 
 import java.util.List;
@@ -17,4 +16,10 @@ public interface OrdenServicioService {
     OrdenServicio update(Long id, OrdenServicioRequest request);
 
     void deleteById(Long id);
+
+    OrdenServicio cambiarEstado(
+            Long id,
+            Long estadoId,
+            String correoUsuario
+    );
 }

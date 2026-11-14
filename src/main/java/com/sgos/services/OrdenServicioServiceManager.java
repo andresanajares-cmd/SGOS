@@ -11,10 +11,12 @@ import com.sgos.dto.OrdenServicioRequest;
 import com.sgos.entities.Cliente;
 import com.sgos.entities.EstadoOrden;
 import com.sgos.entities.OrdenServicio;
+import com.sgos.entities.SeguimientoOrden;
 import com.sgos.entities.Usuarios;
 import com.sgos.repositories.ClienteRepository;
 import com.sgos.repositories.EstadoOrdenRepository;
 import com.sgos.repositories.OrdenServicioRepository;
+import com.sgos.repositories.SeguimientoOrdenRepository;
 import com.sgos.repositories.UsuariosRepository;
 
 @Service
@@ -28,14 +30,17 @@ public class OrdenServicioServiceManager
             OrdenServicioRepository ordenRepository,
             ClienteRepository clienteRepository,
             EstadoOrdenRepository estadoRepository,
-            UsuariosRepository usuariosRepository) {
+            UsuariosRepository usuariosRepository,
+            SeguimientoOrdenRepository seguimientoRepository) {
 
         this.ordenRepository = ordenRepository;
         this.clienteRepository = clienteRepository;
         this.estadoRepository = estadoRepository;
         this.usuariosRepository = usuariosRepository;
+        this.seguimientoRepository = seguimientoRepository;
     }
 
+    private final SeguimientoOrdenRepository seguimientoRepository;
     private final UsuariosRepository usuariosRepository;
     private final EstadoOrdenRepository estadoRepository;
 
@@ -64,7 +69,13 @@ public class OrdenServicioServiceManager
     public OrdenServicio save(OrdenServicioRequest request) {
 
         Cliente cliente = buscarCliente(request.clienteId());
+        EstadoOrden estadoInicial = buscarEstado(request.estadoId());
 
+        if (!"ABIERTA".equals(estadoInicial.getNombre())) {
+            throw new IllegalArgumentException(
+                    "Las órdenes nuevas deben iniciar en estado ABIERTA"
+            );
+        }
         OrdenServicio orden = new OrdenServicio();
 
         asignarDatos(orden, request, cliente);
@@ -88,9 +99,69 @@ public class OrdenServicioServiceManager
 
         OrdenServicio orden = findById(id);
 
+        if (!orden.getEstado().getId().equals(request.estadoId())) {
+            throw new IllegalArgumentException(
+                    "Para cambiar el estado utiliza el endpoint de cambio de estado"
+            );
+        }
+
+        if ("CERRADA".equals(orden.getEstado().getNombre())) {
+            throw new IllegalArgumentException(
+                    "No se puede modificar una orden cerrada"
+            );
+        }
+
         Cliente cliente = buscarCliente(request.clienteId());
 
         asignarDatos(orden, request, cliente);
+
+        return ordenRepository.save(orden);
+    }
+
+    @Override
+    @Transactional
+    public OrdenServicio cambiarEstado(
+            Long id,
+            Long estadoId,
+            String correoUsuario) {
+
+        OrdenServicio orden = findById(id);
+
+        EstadoOrden nuevoEstado = buscarEstado(estadoId);
+
+        String actual = orden.getEstado().getNombre();
+        String siguiente = nuevoEstado.getNombre();
+
+        boolean permitido
+                = (actual.equals("ABIERTA")
+                && siguiente.equals("EN_PROCESO"))
+                || (actual.equals("EN_PROCESO")
+                && siguiente.equals("CERRADA"));
+
+        if (!permitido) {
+            throw new IllegalArgumentException(
+                    "No se permite cambiar de " + actual
+                    + " a " + siguiente
+            );
+        }
+
+        Usuarios usuario = usuariosRepository
+                .findByCorreo(correoUsuario)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe el usuario autenticado"
+                ));
+
+        orden.setEstado(nuevoEstado);
+
+        SeguimientoOrden seguimiento = new SeguimientoOrden();
+
+        seguimiento.setOrden(orden);
+        seguimiento.setUsuario(usuario);
+        seguimiento.setComentario(
+                "Cambio de estado: " + actual + " → " + siguiente
+        );
+
+        seguimientoRepository.save(seguimiento);
 
         return ordenRepository.save(orden);
     }
