@@ -25,8 +25,8 @@ public class OrdenServicio {
 
     private LocalDate fecha;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "estado_id")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "estado_id", nullable = false)
     private EstadoOrden estado;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)

@@ -58,6 +58,8 @@ public class SecurityConfig {
                         // Administradores y técnicos pueden gestionar clientes
                         .requestMatchers("/api/clientes/**")
                         .hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        .requestMatchers(HttpMethod.GET, "/api/estados")
+                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
