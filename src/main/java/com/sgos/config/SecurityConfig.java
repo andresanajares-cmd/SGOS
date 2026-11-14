@@ -49,6 +49,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/ordenesservicios/**")
                         .hasAnyRole("ADMINISTRADOR", "TECNICO")
                         // Las demás rutas requieren autenticación
+
+                        // Solo el administrador puede eliminar clientes
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/clientes/**"
+                        ).hasRole("ADMINISTRADOR")
+                        // Administradores y técnicos pueden gestionar clientes
+                        .requestMatchers("/api/clientes/**")
+                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -93,7 +102,7 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowedMethods(List.of(
-                "GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
 
         configuration.setAllowedHeaders(List.of(

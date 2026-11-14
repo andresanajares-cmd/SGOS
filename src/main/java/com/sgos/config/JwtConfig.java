@@ -1,4 +1,3 @@
-
 package com.sgos.config;
 
 import java.util.Base64;
@@ -16,6 +15,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.sgos.security.UsuarioActivoJwtValidator;
+
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+
 
 @Configuration
 public class JwtConfig {
@@ -29,7 +34,7 @@ public class JwtConfig {
 
         if (bytes.length < 32) {
             throw new IllegalArgumentException(
-                "La clave JWT debe tener al menos 32 bytes"
+                    "La clave JWT debe tener al menos 32 bytes"
             );
         }
 
@@ -41,17 +46,29 @@ public class JwtConfig {
     public JwtEncoder jwtEncoder(SecretKey jwtSecretKey) {
 
         return new NimbusJwtEncoder(
-            new ImmutableSecret<>(jwtSecretKey)
+                new ImmutableSecret<>(jwtSecretKey)
         );
     }
 
     // Configurar la validación de tokens
     @Bean
-    public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
+    public JwtDecoder jwtDecoder(
+            SecretKey jwtSecretKey,
+            UsuarioActivoJwtValidator usuarioActivoJwtValidator) {
 
-        return NimbusJwtDecoder
-            .withSecretKey(jwtSecretKey)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+                .withSecretKey(jwtSecretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+
+        decoder.setJwtValidator(
+                new DelegatingOAuth2TokenValidator<Jwt>(
+                        JwtValidators.createDefaultWithIssuer("sgos"),
+                        usuarioActivoJwtValidator
+                )
+        );
+
+        return decoder;
     }
+
 }
