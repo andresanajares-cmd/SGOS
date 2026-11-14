@@ -33,7 +33,9 @@ public class OrdenServicio {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    private String responsable;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tecnico_id")
+    private Usuarios tecnico;
 
     public OrdenServicio() {
     }
@@ -78,11 +80,12 @@ public class OrdenServicio {
         this.cliente = cliente;
     }
 
-    public String getResponsable() {
-        return responsable;
+    public Usuarios getTecnico() {
+        return tecnico;
     }
 
-    public void setResponsable(String responsable) {
-        this.responsable = responsable;
+    public void setTecnico(Usuarios tecnico) {
+        this.tecnico = tecnico;
     }
+
 }

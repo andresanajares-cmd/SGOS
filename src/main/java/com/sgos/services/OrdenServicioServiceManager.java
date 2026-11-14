@@ -11,9 +11,11 @@ import com.sgos.dto.OrdenServicioRequest;
 import com.sgos.entities.Cliente;
 import com.sgos.entities.EstadoOrden;
 import com.sgos.entities.OrdenServicio;
+import com.sgos.entities.Usuarios;
 import com.sgos.repositories.ClienteRepository;
 import com.sgos.repositories.EstadoOrdenRepository;
 import com.sgos.repositories.OrdenServicioRepository;
+import com.sgos.repositories.UsuariosRepository;
 
 @Service
 public class OrdenServicioServiceManager
@@ -25,13 +27,16 @@ public class OrdenServicioServiceManager
     public OrdenServicioServiceManager(
             OrdenServicioRepository ordenRepository,
             ClienteRepository clienteRepository,
-            EstadoOrdenRepository estadoRepository) {
+            EstadoOrdenRepository estadoRepository,
+            UsuariosRepository usuariosRepository) {
 
         this.ordenRepository = ordenRepository;
         this.clienteRepository = clienteRepository;
         this.estadoRepository = estadoRepository;
+        this.usuariosRepository = usuariosRepository;
     }
 
+    private final UsuariosRepository usuariosRepository;
     private final EstadoOrdenRepository estadoRepository;
 
     @Override
@@ -90,6 +95,32 @@ public class OrdenServicioServiceManager
         return ordenRepository.save(orden);
     }
 
+    private Usuarios buscarTecnico(Long tecnicoId) {
+
+        if (tecnicoId == null) {
+            return null;
+        }
+
+        Usuarios tecnico = usuariosRepository.findById(tecnicoId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe un usuario con ID: " + tecnicoId
+                ));
+
+        if (!"TECNICO".equals(tecnico.getRol().getNombre())) {
+            throw new IllegalArgumentException(
+                    "El usuario seleccionado no tiene el rol TECNICO"
+            );
+        }
+
+        if (!Boolean.TRUE.equals(tecnico.getActivo())) {
+            throw new IllegalArgumentException(
+                    "No se pueden asignar órdenes a técnicos inactivos"
+            );
+        }
+
+        return tecnico;
+    }
+
     @Override
     @Transactional
     public void deleteById(Long id) {
@@ -113,12 +144,13 @@ public class OrdenServicioServiceManager
             Cliente cliente) {
 
         EstadoOrden estado = buscarEstado(request.estadoId());
+        Usuarios tecnico = buscarTecnico(request.tecnicoId());
 
         orden.setDescripcion(request.descripcion().trim());
         orden.setFecha(request.fecha());
         orden.setEstado(estado);
         orden.setCliente(cliente);
-        orden.setResponsable(request.responsable());
+        orden.setTecnico(tecnico);
     }
 
 }

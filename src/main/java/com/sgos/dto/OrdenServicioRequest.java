@@ -20,7 +20,7 @@ public record OrdenServicioRequest(
     @NotNull(message = "El cliente es obligatorio")
     Long clienteId,
 
-    String responsable
+    Long tecnicoId
 
 ) {
 }

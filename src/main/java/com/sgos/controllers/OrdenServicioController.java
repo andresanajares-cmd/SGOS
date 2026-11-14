@@ -1,4 +1,3 @@
-
 package com.sgos.controllers;
 
 import java.util.List;
@@ -18,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sgos.dto.OrdenServicioRequest;
+import com.sgos.dto.OrdenServicioResponse;
 import com.sgos.entities.OrdenServicio;
+import com.sgos.entities.Usuarios;
 import com.sgos.services.OrdenServicioService;
 
 import jakarta.validation.Valid;
@@ -36,11 +37,15 @@ public class OrdenServicioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrdenServicio>> listar() {
+    public ResponseEntity<List<OrdenServicioResponse>> listar() {
 
-        return ResponseEntity.ok(
-            ordenServicioService.findAll()
-        );
+        List<OrdenServicioResponse> ordenes = ordenServicioService
+                .findAll()
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
+
+        return ResponseEntity.ok(ordenes);
     }
 
     @GetMapping("/{id}")
@@ -48,12 +53,12 @@ public class OrdenServicioController {
 
         try {
             return ResponseEntity.ok(
-                ordenServicioService.findById(id)
+                    convertirAResponse(ordenServicioService.findById(id))
             );
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -65,15 +70,18 @@ public class OrdenServicioController {
             OrdenServicio orden = ordenServicioService.save(request);
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                .body(orden);
+                    .body(convertirAResponse(orden));
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
 
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", "No se pudo guardar la orden"));
+                    .body(Map.of("error", "No se pudo guardar la orden"));
         }
     }
 
@@ -84,16 +92,21 @@ public class OrdenServicioController {
 
         try {
             return ResponseEntity.ok(
-                ordenServicioService.update(id, request)
+                    convertirAResponse(
+                            ordenServicioService.update(id, request)
+                    )
             );
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
 
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", "No se pudo actualizar la orden"));
+                    .body(Map.of("error", "No se pudo actualizar la orden"));
         }
     }
 
@@ -107,14 +120,33 @@ public class OrdenServicioController {
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
 
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of(
-                    "error",
-                    "No se puede eliminar la orden porque tiene registros relacionados"
-                ));
+                    .body(Map.of(
+                            "error",
+                            "No se puede eliminar la orden porque tiene registros relacionados"
+                    ));
         }
     }
+
+    private OrdenServicioResponse convertirAResponse(
+            OrdenServicio orden) {
+
+        Usuarios tecnico = orden.getTecnico();
+
+        return new OrdenServicioResponse(
+                orden.getId(),
+                orden.getDescripcion(),
+                orden.getFecha(),
+                orden.getEstado().getId(),
+                orden.getEstado().getNombre(),
+                orden.getCliente().getId(),
+                orden.getCliente().getNombre(),
+                tecnico != null ? tecnico.getId() : null,
+                tecnico != null ? tecnico.getNombre() : null
+        );
+    }
+
 }
