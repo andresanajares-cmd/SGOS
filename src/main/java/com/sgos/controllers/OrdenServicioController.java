@@ -152,23 +152,10 @@ public class OrdenServicioController {
     public ResponseEntity<?> crear(
             @Valid @RequestBody OrdenServicioRequest request) {
 
-        try {
-            OrdenServicio orden = ordenServicioService.save(request);
+        OrdenServicio orden = ordenServicioService.save(request);
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(convertirAResponse(orden));
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "No se pudo guardar la orden"));
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(convertirAResponse(orden));
     }
 
     @PutMapping("/{id}")
@@ -176,24 +163,11 @@ public class OrdenServicioController {
             @PathVariable Long id,
             @Valid @RequestBody OrdenServicioRequest request) {
 
-        try {
-            return ResponseEntity.ok(
-                    convertirAResponse(
-                            ordenServicioService.update(id, request)
-                    )
-            );
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "No se pudo actualizar la orden"));
-        }
+        return ResponseEntity.ok(
+                convertirAResponse(
+                        ordenServicioService.update(id, request)
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
