@@ -1,6 +1,6 @@
-
 package com.sgos.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,23 +31,23 @@ public class UsuariosSeriviceManager implements UsuariosService {
         // Verificar si el correo ya existe
         if (repository.existsByCorreo(usuario.getCorreo())) {
             throw new IllegalArgumentException(
-                "El correo ya está registrado"
+                    "El correo ya está registrado"
             );
         }
 
         // Asignar siempre el rol TECNICO en el registro público
         Rol rol = rolRepository.findByNombre("TECNICO")
-            .orElseThrow(() -> new IllegalStateException(
-                "El rol TECNICO no existe"
-            ));
+                .orElseThrow(() -> new IllegalStateException(
+                        "El rol TECNICO no existe"
+                ));
 
         usuario.setId(null);
         usuario.setRol(rol);
         usuario.setActivo(true);
 
         // Proteger la contraseña con BCrypt
-        String contrasenaEncriptada =
-            passwordEncoder.encode(usuario.getContrasena());
+        String contrasenaEncriptada
+                = passwordEncoder.encode(usuario.getContrasena());
 
         usuario.setContrasena(contrasenaEncriptada);
 
@@ -58,8 +58,8 @@ public class UsuariosSeriviceManager implements UsuariosService {
     @Override
     public boolean authenticateUser(String correo, String contrasena) {
 
-        Optional<Usuarios> usuarioEncontrado =
-            repository.findByCorreo(correo);
+        Optional<Usuarios> usuarioEncontrado
+                = repository.findByCorreo(correo);
 
         if (usuarioEncontrado.isEmpty()) {
             return false;
@@ -73,40 +73,63 @@ public class UsuariosSeriviceManager implements UsuariosService {
 
         // Comparar la contraseña con el hash almacenado
         return passwordEncoder.matches(
-            contrasena,
-            usuario.getContrasena()
+                contrasena,
+                usuario.getContrasena()
         );
     }
 
-@Override
-public Usuarios crearTecnico(CrearUsuarioRequest request) {
+    @Override
+    public Usuarios crearTecnico(CrearUsuarioRequest request) {
 
-    String correo = request.correo().trim().toLowerCase();
+        String correo = request.correo().trim().toLowerCase();
 
-    if (repository.existsByCorreo(correo)) {
-        throw new IllegalArgumentException(
-            "El correo ya está registrado"
+        if (repository.existsByCorreo(correo)) {
+            throw new IllegalArgumentException(
+                    "El correo ya está registrado"
+            );
+        }
+
+        Rol rolTecnico = rolRepository
+                .findByNombre("TECNICO")
+                .orElseThrow(() -> new IllegalStateException(
+                        "No existe el rol TECNICO"
+                ));
+
+        Usuarios usuario = new Usuarios();
+
+        usuario.setNombre(request.nombre().trim());
+        usuario.setCorreo(correo);
+        usuario.setContrasena(
+                passwordEncoder.encode(request.contrasena())
         );
+        usuario.setTelefono(request.telefono());
+        usuario.setRol(rolTecnico);
+        usuario.setActivo(true);
+
+        return repository.save(usuario);
     }
 
-    Rol rolTecnico = rolRepository
-        .findByNombre("TECNICO")
-        .orElseThrow(() -> new IllegalStateException(
-            "No existe el rol TECNICO"
-        ));
+    @Override
+    public List<Usuarios> listarUsuarios() {
+        return repository.findAll();
+    }
 
-    Usuarios usuario = new Usuarios();
+    @Override
+    public Usuarios buscarPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El usuario no existe"
+                ));
+    }
 
-    usuario.setNombre(request.nombre().trim());
-    usuario.setCorreo(correo);
-    usuario.setContrasena(
-        passwordEncoder.encode(request.contrasena())
-    );
-    usuario.setTelefono(request.telefono());
-    usuario.setRol(rolTecnico);
-    usuario.setActivo(true);
+    @Override
+    public Usuarios cambiarEstado(Long id, boolean activo) {
 
-    return repository.save(usuario);
-}
+        Usuarios usuario = buscarPorId(id);
+
+        usuario.setActivo(activo);
+
+        return repository.save(usuario);
+    }
 
 }
