@@ -1,10 +1,7 @@
 package com.sgos.controllers;
 
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -109,28 +106,15 @@ public class OrdenServicioController {
             @Valid @RequestBody CambiarEstadoOrdenRequest request,
             Authentication authentication) {
 
-        try {
+        OrdenServicio orden = ordenServicioService.cambiarEstado(
+                id,
+                request.estadoId(),
+                authentication.getName()
+        );
 
-            OrdenServicio orden = ordenServicioService.cambiarEstado(
-                    id,
-                    request.estadoId(),
-                    authentication.getName()
-            );
-
-            return ResponseEntity.ok(
-                    convertirAResponse(orden)
-            );
-
-        } catch (NoSuchElementException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(
+                convertirAResponse(orden)
+        );
     }
 
     @GetMapping("/{id}")
@@ -173,22 +157,9 @@ public class OrdenServicioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
 
-        try {
-            ordenServicioService.deleteById(id);
+        ordenServicioService.deleteById(id);
 
-            return ResponseEntity.noContent().build();
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of(
-                            "error",
-                            "No se puede eliminar la orden porque tiene registros relacionados"
-                    ));
-        }
+        return ResponseEntity.noContent().build();
     }
 
     private OrdenServicioResponse convertirAResponse(
@@ -213,22 +184,14 @@ public class OrdenServicioController {
     public ResponseEntity<?> misOrdenes(
             Authentication authentication) {
 
-        try {
+        List<OrdenServicioResponse> ordenes
+                = ordenServicioService
+                        .findMisOrdenes(authentication.getName())
+                        .stream()
+                        .map(this::convertirAResponse)
+                        .toList();
 
-            List<OrdenServicioResponse> ordenes
-                    = ordenServicioService
-                            .findMisOrdenes(authentication.getName())
-                            .stream()
-                            .map(this::convertirAResponse)
-                            .toList();
-
-            return ResponseEntity.ok(ordenes);
-
-        } catch (NoSuchElementException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(ordenes);
     }
 
 }
