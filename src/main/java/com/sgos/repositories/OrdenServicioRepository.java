@@ -1,11 +1,11 @@
+
 package com.sgos.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.sgos.entities.OrdenServicio;
 
-//patrón de diseño llamado Repository combinado con Proxies dinámicos de Java 
-//(nos permite implemetar metodos CRUD (Create, Read, Update, Delete)).
-public interface OrdenServicioRepository extends CrudRepository<OrdenServicio, Long> {
-    
+public interface OrdenServicioRepository
+        extends JpaRepository<OrdenServicio, Long> {
+
 }

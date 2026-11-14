@@ -1,59 +1,124 @@
 package com.sgos.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.sgos.dto.OrdenServicioRequest;
+import com.sgos.entities.Cliente;
+import com.sgos.entities.EstadoOrden;
 import com.sgos.entities.OrdenServicio;
+import com.sgos.repositories.ClienteRepository;
+import com.sgos.repositories.EstadoOrdenRepository;
 import com.sgos.repositories.OrdenServicioRepository;
 
+@Service
+public class OrdenServicioServiceManager
+        implements OrdenServicioService {
 
-@Service //Decorador de spring para guardar la logica de la aplicacion. 
-// en este caso la logica de negocio de la entidad OrdenServicio
-public class OrdenServicioServiceManager implements OrdenServicioService {
-    
+    private final OrdenServicioRepository ordenRepository;
+    private final ClienteRepository clienteRepository;
 
-    @Autowired 
-    private OrdenServicioRepository repository; //Inyeccion de dependencias para acceder a los metodos del repositorio de la entidad OrdenServicio. 
+    public OrdenServicioServiceManager(
+            OrdenServicioRepository ordenRepository,
+            ClienteRepository clienteRepository,
+            EstadoOrdenRepository estadoRepository) {
 
+        this.ordenRepository = ordenRepository;
+        this.clienteRepository = clienteRepository;
+        this.estadoRepository = estadoRepository;
+    }
 
-    @Override 
+    private final EstadoOrdenRepository estadoRepository;
+
+    @Override
+    @Transactional(readOnly = true)
     public List<OrdenServicio> findAll() {
-        return (List<OrdenServicio>) this.repository.findAll();
+
+        List<OrdenServicio> ordenes = new ArrayList<>();
+
+        ordenRepository.findAll().forEach(ordenes::add);
+
+        return ordenes;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrdenServicio findById(Long id) {
-        return this.repository.findById(id).get();
+        return ordenRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe una orden con ID: " + id
+                ));
     }
 
     @Override
-    public OrdenServicio save(OrdenServicio ordenServicio) {
-        return this.repository.save(ordenServicio);
+    @Transactional
+    public OrdenServicio save(OrdenServicioRequest request) {
+
+        Cliente cliente = buscarCliente(request.clienteId());
+
+        OrdenServicio orden = new OrdenServicio();
+
+        asignarDatos(orden, request, cliente);
+
+        return ordenRepository.save(orden);
+    }
+
+    private EstadoOrden buscarEstado(Long estadoId) {
+
+        return estadoRepository.findById(estadoId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe un estado con ID: " + estadoId
+                ));
     }
 
     @Override
-    public OrdenServicio update(Long id, OrdenServicio ordenServicio) {
-        OrdenServicio orden = this.repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Orden de servicio no encontrada con id: " + id));
+    @Transactional
+    public OrdenServicio update(
+            Long id,
+            OrdenServicioRequest request) {
 
-        orden.setCliente(ordenServicio.getCliente());
-        orden.setDescripcion(ordenServicio.getDescripcion());
-        orden.setFecha(ordenServicio.getFecha());
-        orden.setEstado(ordenServicio.getEstado());
-        orden.setResponsable(ordenServicio.getResponsable());
+        OrdenServicio orden = findById(id);
 
-        return this.repository.save(orden);
+        Cliente cliente = buscarCliente(request.clienteId());
+
+        asignarDatos(orden, request, cliente);
+
+        return ordenRepository.save(orden);
     }
 
     @Override
-    public void delete(Long id) {
-        OrdenServicio orden = this.repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Orden de servicio no encontrada con id: " + id));
-        this.repository.delete(orden);
+    @Transactional
+    public void deleteById(Long id) {
+
+        OrdenServicio orden = findById(id);
+
+        ordenRepository.delete(orden);
     }
 
+    private Cliente buscarCliente(Long clienteId) {
 
-    
+        return clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe un cliente con ID: " + clienteId
+                ));
+    }
+
+    private void asignarDatos(
+            OrdenServicio orden,
+            OrdenServicioRequest request,
+            Cliente cliente) {
+
+        EstadoOrden estado = buscarEstado(request.estadoId());
+
+        orden.setDescripcion(request.descripcion().trim());
+        orden.setFecha(request.fecha());
+        orden.setEstado(estado);
+        orden.setCliente(cliente);
+        orden.setResponsable(request.responsable());
+    }
+
 }
