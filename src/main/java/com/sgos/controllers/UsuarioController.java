@@ -44,28 +44,20 @@ public class UsuarioController {
     public ResponseEntity<?> crearTecnico(
             @Valid @RequestBody CrearUsuarioRequest request) {
 
-        try {
-            Usuarios usuario = usuarioService.crearTecnico(request);
+        Usuarios usuario = usuarioService.crearTecnico(request);
 
-            UsuarioResponse respuesta = new UsuarioResponse(
-                    usuario.getId(),
-                    usuario.getNombre(),
-                    usuario.getCorreo(),
-                    usuario.getTelefono(),
-                    usuario.getRol().getNombre(),
-                    usuario.getActivo()
-            );
+        UsuarioResponse respuesta = new UsuarioResponse(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getTelefono(),
+                usuario.getRol().getNombre(),
+                usuario.getActivo()
+        );
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(respuesta);
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.badRequest().body(
-                    Map.of("error", e.getMessage())
-            );
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(respuesta);
     }
 
     @PostMapping("/login")
@@ -126,19 +118,11 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarUsuario(@PathVariable Long id) {
 
-        try {
-            Usuarios usuario = usuarioService.buscarPorId(id);
+        Usuarios usuario = usuarioService.buscarPorId(id);
 
-            return ResponseEntity.ok(
-                    convertirAResponse(usuario)
-            );
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("error", e.getMessage())
-            );
-        }
+        return ResponseEntity.ok(
+                convertirAResponse(usuario)
+        );
     }
 
     @PatchMapping("/{id}/estado")
@@ -147,38 +131,25 @@ public class UsuarioController {
             @Valid @RequestBody CambiarEstadoRequest request,
             Authentication authentication) {
 
-        try {
+        Usuarios usuario = usuarioService.buscarPorId(id);
 
-            Usuarios usuario = usuarioService.buscarPorId(id);
+        // Impedir que el administrador desactive su propia cuenta
+        if (!request.activo()
+                && usuario.getCorreo().equalsIgnoreCase(authentication.getName())) {
 
-            // Impedir que el administrador desactive su propia cuenta
-            if (!request.activo()
-                    && usuario.getCorreo().equalsIgnoreCase(
-                            authentication.getName())) {
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "error",
-                                "No puedes desactivar tu propia cuenta"
-                        )
-                );
-            }
-
-            Usuarios actualizado = usuarioService.cambiarEstado(
-                    id,
-                    request.activo()
-            );
-
-            return ResponseEntity.ok(
-                    convertirAResponse(actualizado)
-            );
-
-        } catch (IllegalArgumentException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("error", e.getMessage())
+            throw new IllegalArgumentException(
+                    "No puedes desactivar tu propia cuenta"
             );
         }
+
+        Usuarios actualizado = usuarioService.cambiarEstado(
+                id,
+                request.activo()
+        );
+
+        return ResponseEntity.ok(
+                convertirAResponse(actualizado)
+        );
     }
 
     private UsuarioResponse convertirAResponse(Usuarios usuario) {

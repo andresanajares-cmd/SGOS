@@ -1,8 +1,7 @@
+
 package com.sgos.controllers;
 
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,49 +31,34 @@ public class SeguimientoOrdenController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(
+    public ResponseEntity<SeguimientoOrdenResponse> crear(
             @PathVariable Long ordenId,
             @Valid @RequestBody SeguimientoOrdenRequest request,
             Authentication authentication) {
 
-        try {
-            SeguimientoOrdenResponse seguimiento
-                    = seguimientoService.crear(
-                            ordenId,
-                            request,
-                            authentication.getName()
-                    );
+        SeguimientoOrdenResponse seguimiento =
+                seguimientoService.crear(
+                        ordenId,
+                        request,
+                        authentication.getName()
+                );
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(seguimiento);
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(seguimiento);
     }
 
     @GetMapping
-    public ResponseEntity<?> listar(
+    public ResponseEntity<List<SeguimientoOrdenResponse>> listar(
             @PathVariable Long ordenId,
             Authentication authentication) {
 
-        try {
+        List<SeguimientoOrdenResponse> seguimientos =
+                seguimientoService.listarPorOrden(
+                        ordenId,
+                        authentication.getName()
+                );
 
-            List<SeguimientoOrdenResponse> seguimientos
-                    = seguimientoService.listarPorOrden(
-                            ordenId,
-                            authentication.getName()
-                    );
-
-            return ResponseEntity.ok(seguimientos);
-
-        } catch (NoSuchElementException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(seguimientos);
     }
-
 }

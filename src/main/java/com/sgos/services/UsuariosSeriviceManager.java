@@ -1,6 +1,7 @@
 package com.sgos.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,9 +118,7 @@ public class UsuariosSeriviceManager implements UsuariosService {
     @Override
     public Usuarios buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "El usuario no existe"
-                ));
+                .orElseThrow(() -> new NoSuchElementException("El usuario no existe"));
     }
 
     @Override

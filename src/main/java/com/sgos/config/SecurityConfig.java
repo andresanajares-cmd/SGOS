@@ -31,44 +31,109 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // AUTENTICACIÓN
+
                         // Inicio de sesión público
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/usuarios/login"
                         ).permitAll()
-                        // Registro temporalmente público
-                        // Solo el administrador puede gestionar usuarios
+                        // USUARIOS
+
+                        // Solo administradores pueden gestionar usuarios
                         .requestMatchers("/api/usuarios/**")
                         .hasRole("ADMINISTRADOR")
+                        // CLIENTES
+
+                        // Solo administradores pueden modificar clientes
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/clientes/**"
+                        ).hasRole("ADMINISTRADOR")
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/clientes/**"
+                        ).hasRole("ADMINISTRADOR")
+                        // Solo administradores pueden eliminar clientes
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/clientes/**"
+                        ).hasRole("ADMINISTRADOR")
+                        // Administradores y técnicos pueden consultar clientes
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/clientes",
+                                "/api/clientes/**"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // Administradores y técnicos pueden crear clientes
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/clientes",
+                                "/api/clientes/**"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // ÓRDENES DE SERVICIO
+
                         // Solo administradores pueden eliminar órdenes
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/ordenesservicios/**"
                         ).hasRole("ADMINISTRADOR")
+                        // Solo administradores pueden modificar datos de órdenes
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/ordenesservicios/**"
+                        ).hasRole("ADMINISTRADOR")
+                        // Solo administradores pueden consultar todas las órdenes
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/ordenesservicios"
                         ).hasRole("ADMINISTRADOR")
+                        // Administradores y técnicos pueden consultar sus órdenes
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/ordenesservicios/mis-ordenes"
                         ).hasAnyRole("ADMINISTRADOR", "TECNICO")
-                        // Administradores y técnicos pueden consultar y crear órdenes
-                        .requestMatchers("/api/ordenesservicios/**")
-                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
-                        // Las demás rutas requieren autenticación
-
-                        // Solo el administrador puede eliminar clientes
+                        // Administradores y técnicos pueden crear órdenes
                         .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/clientes/**"
-                        ).hasRole("ADMINISTRADOR")
-                        // Administradores y técnicos pueden gestionar clientes
-                        .requestMatchers("/api/clientes/**")
-                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
-                        .requestMatchers(HttpMethod.GET, "/api/estados")
-                        .hasAnyRole("ADMINISTRADOR", "TECNICO")
-                        .anyRequest().authenticated()
+                                HttpMethod.POST,
+                                "/api/ordenesservicios"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // Administradores y técnicos pueden cambiar estados
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/ordenesservicios/*/estado"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // Administradores y técnicos pueden consultar
+                        // órdenes individuales
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ordenesservicios/*"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                          // SEGUIMIENTOS
+
+                        // Administradores y técnicos pueden consultar seguimientos
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ordenesservicios/*/seguimientos"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+
+                        // Administradores y técnicos pueden registrar seguimientos
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/ordenesservicios/*/seguimientos"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // ESTADOS
+
+                        // Administradores y técnicos pueden consultar estados
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/estados"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
+                        // OTRAS RUTAS
+
+                        
+                        // de manera predeterminada, pero no se permite el acceso a ninguna otra ruta
+                        .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
