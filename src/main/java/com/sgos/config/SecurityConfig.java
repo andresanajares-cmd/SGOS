@@ -45,6 +45,14 @@ public class SecurityConfig {
                                 HttpMethod.DELETE,
                                 "/api/ordenesservicios/**"
                         ).hasRole("ADMINISTRADOR")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ordenesservicios"
+                        ).hasRole("ADMINISTRADOR")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ordenesservicios/mis-ordenes"
+                        ).hasAnyRole("ADMINISTRADOR", "TECNICO")
                         // Administradores y técnicos pueden consultar y crear órdenes
                         .requestMatchers("/api/ordenesservicios/**")
                         .hasAnyRole("ADMINISTRADOR", "TECNICO")

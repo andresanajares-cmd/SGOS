@@ -22,4 +22,6 @@ public interface OrdenServicioService {
             Long estadoId,
             String correoUsuario
     );
+    List<OrdenServicio> findMisOrdenes(String correoUsuario);
+    OrdenServicio findByIdParaUsuario(Long id, String correoUsuario);
 }

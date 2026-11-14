@@ -126,6 +126,7 @@ public class OrdenServicioServiceManager
             String correoUsuario) {
 
         OrdenServicio orden = findById(id);
+        validarAccesoOrden(orden, correoUsuario);
 
         EstadoOrden nuevoEstado = buscarEstado(estadoId);
 
@@ -222,6 +223,63 @@ public class OrdenServicioServiceManager
         orden.setEstado(estado);
         orden.setCliente(cliente);
         orden.setTecnico(tecnico);
+    }
+
+    public void validarAccesoOrden(
+            OrdenServicio orden,
+            String correoUsuario) {
+
+        Usuarios usuario = usuariosRepository
+                .findByCorreo(correoUsuario)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe el usuario autenticado"
+                ));
+
+        String rol = usuario.getRol().getNombre();
+
+        if ("ADMINISTRADOR".equals(rol)) {
+            return;
+        }
+
+        if (!"TECNICO".equals(rol)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "No tienes permisos para acceder a esta orden"
+            );
+        }
+
+        if (orden.getTecnico() == null
+                || !orden.getTecnico().getId().equals(usuario.getId())) {
+
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Esta orden no está asignada a tu usuario"
+            );
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrdenServicio> findMisOrdenes(String correoUsuario) {
+
+        Usuarios usuario = usuariosRepository
+                .findByCorreo(correoUsuario)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe el usuario autenticado"
+                ));
+
+        return ordenRepository.findByTecnico_Id(usuario.getId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrdenServicio findByIdParaUsuario(
+            Long id,
+            String correoUsuario) {
+
+        OrdenServicio orden = findById(id);
+
+        validarAccesoOrden(orden, correoUsuario);
+
+        return orden;
     }
 
 }

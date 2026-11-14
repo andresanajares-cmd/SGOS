@@ -1,4 +1,3 @@
-
 package com.sgos.controllers;
 
 import java.util.List;
@@ -39,35 +38,43 @@ public class SeguimientoOrdenController {
             Authentication authentication) {
 
         try {
-            SeguimientoOrdenResponse seguimiento =
-                seguimientoService.crear(
-                    ordenId,
-                    request,
-                    authentication.getName()
-                );
+            SeguimientoOrdenResponse seguimiento
+                    = seguimientoService.crear(
+                            ordenId,
+                            request,
+                            authentication.getName()
+                    );
 
             return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(seguimiento);
+                    .status(HttpStatus.CREATED)
+                    .body(seguimiento);
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> listar(@PathVariable Long ordenId) {
+    public ResponseEntity<?> listar(
+            @PathVariable Long ordenId,
+            Authentication authentication) {
 
         try {
-            List<SeguimientoOrdenResponse> seguimientos =
-                seguimientoService.listarPorOrden(ordenId);
+
+            List<SeguimientoOrdenResponse> seguimientos
+                    = seguimientoService.listarPorOrden(
+                            ordenId,
+                            authentication.getName()
+                    );
 
             return ResponseEntity.ok(seguimientos);
 
         } catch (NoSuchElementException e) {
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
+
 }

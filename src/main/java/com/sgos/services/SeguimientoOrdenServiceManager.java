@@ -1,4 +1,3 @@
-
 package com.sgos.services;
 
 import java.util.List;
@@ -23,15 +22,18 @@ public class SeguimientoOrdenServiceManager
     private final SeguimientoOrdenRepository seguimientoRepository;
     private final OrdenServicioRepository ordenRepository;
     private final UsuariosRepository usuariosRepository;
+    private final OrdenServicioServiceManager ordenServiceManager;
 
     public SeguimientoOrdenServiceManager(
             SeguimientoOrdenRepository seguimientoRepository,
             OrdenServicioRepository ordenRepository,
-            UsuariosRepository usuariosRepository) {
+            UsuariosRepository usuariosRepository,
+            OrdenServicioServiceManager ordenServiceManager) {
 
         this.seguimientoRepository = seguimientoRepository;
         this.ordenRepository = ordenRepository;
         this.usuariosRepository = usuariosRepository;
+        this.ordenServiceManager = ordenServiceManager;
     }
 
     @Override
@@ -42,14 +44,20 @@ public class SeguimientoOrdenServiceManager
             String correoUsuario) {
 
         OrdenServicio orden = ordenRepository.findById(ordenId)
-            .orElseThrow(() -> new NoSuchElementException(
-                "No existe una orden con ID: " + ordenId
-            ));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe una orden con ID: " + ordenId
+                ));
+
+        // Verificar que el usuario tenga acceso a la orden
+        ordenServiceManager.validarAccesoOrden(
+                orden,
+                correoUsuario
+        );
 
         Usuarios usuario = usuariosRepository.findByCorreo(correoUsuario)
-            .orElseThrow(() -> new NoSuchElementException(
-                "No existe el usuario autenticado"
-            ));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe el usuario autenticado"
+                ));
 
         SeguimientoOrden seguimiento = new SeguimientoOrden();
 
@@ -57,39 +65,48 @@ public class SeguimientoOrdenServiceManager
         seguimiento.setOrden(orden);
         seguimiento.setUsuario(usuario);
 
-        SeguimientoOrden guardado =
-            seguimientoRepository.saveAndFlush(seguimiento);
+        SeguimientoOrden guardado
+                = seguimientoRepository.saveAndFlush(seguimiento);
 
         return convertirAResponse(guardado);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<SeguimientoOrdenResponse> listarPorOrden(Long ordenId) {
+    public List<SeguimientoOrdenResponse> listarPorOrden(
+            Long ordenId,
+            String correoUsuario) {
 
-        if (!ordenRepository.existsById(ordenId)) {
-            throw new NoSuchElementException(
-                "No existe una orden con ID: " + ordenId
-            );
-        }
+        OrdenServicio orden = ordenRepository.findById(ordenId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe una orden con ID: " + ordenId
+                ));
+
+        // Verificar que el usuario pueda consultar esta orden
+        ordenServiceManager.validarAccesoOrden(
+                orden,
+                correoUsuario
+        );
 
         return seguimientoRepository
-            .findByOrden_IdOrderByFechaRegistroAscIdAsc(ordenId)
-            .stream()
-            .map(this::convertirAResponse)
-            .toList();
+                .findByOrden_IdOrderByFechaRegistroAscIdAsc(ordenId)
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
-    private SeguimientoOrdenResponse convertirAResponse(
-            SeguimientoOrden seguimiento) {
+private SeguimientoOrdenResponse convertirAResponse(
+        SeguimientoOrden seguimiento) {
 
-        return new SeguimientoOrdenResponse(
-            seguimiento.getId(),
-            seguimiento.getComentario(),
-            seguimiento.getFechaRegistro(),
-            seguimiento.getOrden().getId(),
-            seguimiento.getUsuario().getId(),
-            seguimiento.getUsuario().getNombre()
-        );
-    }
+    return new SeguimientoOrdenResponse(
+        seguimiento.getId(),
+        seguimiento.getComentario(),
+        seguimiento.getFechaRegistro(),
+        seguimiento.getOrden().getId(),
+        seguimiento.getUsuario().getId(),
+        seguimiento.getUsuario().getNombre()
+    );
+}
+
+
 }

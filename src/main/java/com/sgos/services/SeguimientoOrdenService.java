@@ -14,5 +14,8 @@ public interface SeguimientoOrdenService {
         String correoUsuario
     );
 
-    List<SeguimientoOrdenResponse> listarPorOrden(Long ordenId);
+    List<SeguimientoOrdenResponse> listarPorOrden(
+        Long ordenId,
+        String correoUsuario
+    );
 }

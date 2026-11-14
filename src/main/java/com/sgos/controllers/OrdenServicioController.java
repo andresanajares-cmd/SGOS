@@ -82,17 +82,18 @@ public class OrdenServicioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        try {
-            return ResponseEntity.ok(
-                    convertirAResponse(ordenServicioService.findById(id))
-            );
-
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(
+                convertirAResponse(
+                        ordenServicioService.findByIdParaUsuario(
+                                id,
+                                authentication.getName()
+                        )
+                )
+        );
     }
 
     @PostMapping
@@ -180,6 +181,28 @@ public class OrdenServicioController {
                 tecnico != null ? tecnico.getId() : null,
                 tecnico != null ? tecnico.getNombre() : null
         );
+    }
+
+    @GetMapping("/mis-ordenes")
+    public ResponseEntity<?> misOrdenes(
+            Authentication authentication) {
+
+        try {
+
+            List<OrdenServicioResponse> ordenes
+                    = ordenServicioService
+                            .findMisOrdenes(authentication.getName())
+                            .stream()
+                            .map(this::convertirAResponse)
+                            .toList();
+
+            return ResponseEntity.ok(ordenes);
+
+        } catch (NoSuchElementException e) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
 }
