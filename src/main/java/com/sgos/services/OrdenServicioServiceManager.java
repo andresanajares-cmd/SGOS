@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,8 @@ import com.sgos.repositories.EstadoOrdenRepository;
 import com.sgos.repositories.OrdenServicioRepository;
 import com.sgos.repositories.SeguimientoOrdenRepository;
 import com.sgos.repositories.UsuariosRepository;
+
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class OrdenServicioServiceManager
@@ -280,6 +285,52 @@ public class OrdenServicioServiceManager
         validarAccesoOrden(orden, correoUsuario);
 
         return orden;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrdenServicio> filtrarOrdenes(
+            Long estadoId,
+            Long clienteId,
+            Long tecnicoId,
+            String descripcion,
+            Pageable pageable) {
+
+        Specification<OrdenServicio> specification = (root, query, cb) -> {
+
+            List<Predicate> condiciones = new ArrayList<>();
+
+            if (estadoId != null) {
+                condiciones.add(
+                        cb.equal(root.get("estado").get("id"), estadoId)
+                );
+            }
+
+            if (clienteId != null) {
+                condiciones.add(
+                        cb.equal(root.get("cliente").get("id"), clienteId)
+                );
+            }
+
+            if (tecnicoId != null) {
+                condiciones.add(
+                        cb.equal(root.get("tecnico").get("id"), tecnicoId)
+                );
+            }
+
+            if (descripcion != null && !descripcion.isBlank()) {
+                condiciones.add(
+                        cb.like(
+                                cb.lower(root.get("descripcion")),
+                                "%" + descripcion.trim().toLowerCase(java.util.Locale.ROOT) + "%"
+                        )
+                );
+            }
+
+            return cb.and(condiciones.toArray(new Predicate[0]));
+        };
+
+        return ordenRepository.findAll(specification, pageable);
     }
 
 }
