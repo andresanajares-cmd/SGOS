@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sgos.dto.CambiarEstadoOrdenRequest;
 import com.sgos.dto.OrdenServicioRequest;
@@ -44,48 +45,63 @@ public class OrdenServicioController {
         this.ordenServicioService = ordenServicioService;
     }
 
-   
-@GetMapping
-public ResponseEntity<Page<OrdenServicioResponse>> listar(
-        @RequestParam(required = false) Long estadoId,
-        @RequestParam(required = false) Long clienteId,
-        @RequestParam(required = false) Long tecnicoId,
-        @RequestParam(required = false) String descripcion,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "fecha") String ordenarPor,
-        @RequestParam(defaultValue = "desc") String direccion) {
+    @GetMapping
+    public ResponseEntity<Page<OrdenServicioResponse>> listar(
+            @RequestParam(required = false) Long estadoId,
+            @RequestParam(required = false) Long clienteId,
+            @RequestParam(required = false) Long tecnicoId,
+            @RequestParam(required = false) String descripcion,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "fecha") String ordenarPor,
+            @RequestParam(defaultValue = "desc") String direccion) {
 
-    if (page < 0 || size < 1 || size > 100) {
-        return ResponseEntity.badRequest().build();
+        if (page < 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El número de página no puede ser negativo"
+            );
+        }
+
+        if (size < 1 || size > 100) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El tamaño de página debe estar entre 1 y 100"
+            );
+        }
+
+        if (!List.of("id", "fecha", "descripcion").contains(ordenarPor)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El campo de ordenamiento no es válido. Campos permitidos: id, fecha, descripcion"
+            );
+        }
+
+        if (!direccion.equalsIgnoreCase("asc")
+                && !direccion.equalsIgnoreCase("desc")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La dirección de ordenamiento no es válida. Valores permitidos: asc, desc"
+            );
+        }
+
+        Sort sort = direccion.equalsIgnoreCase("asc")
+                ? Sort.by(ordenarPor).ascending()
+                : Sort.by(ordenarPor).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<OrdenServicioResponse> resultado
+                = ordenServicioService.filtrarOrdenes(
+                        estadoId,
+                        clienteId,
+                        tecnicoId,
+                        descripcion,
+                        pageable
+                ).map(this::convertirAResponse);
+
+        return ResponseEntity.ok(resultado);
     }
-
-    if (!List.of("id", "fecha", "descripcion").contains(ordenarPor)) {
-        return ResponseEntity.badRequest().build();
-    }
-
-    if (!direccion.equalsIgnoreCase("asc")
-            && !direccion.equalsIgnoreCase("desc")) {
-        return ResponseEntity.badRequest().build();
-    }
-
-    Sort sort = direccion.equalsIgnoreCase("asc")
-            ? Sort.by(ordenarPor).ascending()
-            : Sort.by(ordenarPor).descending();
-
-    Pageable pageable = PageRequest.of(page, size, sort);
-
-    Page<OrdenServicioResponse> resultado =
-            ordenServicioService.filtrarOrdenes(
-                    estadoId,
-                    clienteId,
-                    tecnicoId,
-                    descripcion,
-                    pageable
-            ).map(this::convertirAResponse);
-
-    return ResponseEntity.ok(resultado);
-}
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<?> cambiarEstado(

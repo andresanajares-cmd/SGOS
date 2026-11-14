@@ -7,8 +7,10 @@ import java.util.NoSuchElementException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sgos.dto.OrdenServicioRequest;
 import com.sgos.entities.Cliente;
@@ -42,6 +44,7 @@ public class OrdenServicioServiceManager
         this.clienteRepository = clienteRepository;
         this.estadoRepository = estadoRepository;
         this.usuariosRepository = usuariosRepository;
+        
         this.seguimientoRepository = seguimientoRepository;
     }
 
@@ -61,10 +64,10 @@ public class OrdenServicioServiceManager
     }
 
     @Override
-    @Transactional(readOnly = true)
     public OrdenServicio findById(Long id) {
         return ordenRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         "No existe una orden con ID: " + id
                 ));
     }
