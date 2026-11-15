@@ -1,7 +1,6 @@
 package com.sgos.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sgos.dto.CambiarEstadoRequest;
 import com.sgos.dto.CrearUsuarioRequest;
@@ -69,8 +69,8 @@ public class UsuarioController {
                 || request.correo().isBlank()
                 || request.contrasena().isBlank()) {
 
-            return ResponseEntity.badRequest().body(
-                    Map.of("error", "Correo y contraseña son obligatorios")
+            throw new IllegalArgumentException(
+                    "Correo y contraseña son obligatorios"
             );
         }
 
@@ -80,13 +80,14 @@ public class UsuarioController {
         );
 
         if (!autenticado) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    Map.of("error", "Credenciales incorrectas")
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Credenciales incorrectas"
             );
         }
 
         Usuarios usuario = usuariosRepository
-                .findByCorreo(request.correo())
+                .findByCorreo(request.correo().trim().toLowerCase(java.util.Locale.ROOT))
                 .orElseThrow();
 
         String token = jwtService.generarToken(usuario);

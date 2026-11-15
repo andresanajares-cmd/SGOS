@@ -44,7 +44,7 @@ public class OrdenServicioServiceManager
         this.clienteRepository = clienteRepository;
         this.estadoRepository = estadoRepository;
         this.usuariosRepository = usuariosRepository;
-        
+
         this.seguimientoRepository = seguimientoRepository;
     }
 
@@ -207,6 +207,10 @@ public class OrdenServicioServiceManager
 
         OrdenServicio orden = findById(id);
 
+        // Eliminar los seguimientos asociados a la orden
+        seguimientoRepository.deleteByOrden_Id(id);
+
+        // Eliminar la orden de servicio
         ordenRepository.delete(orden);
     }
 

@@ -1,4 +1,3 @@
-
 package com.sgos.repositories;
 
 import java.util.List;
@@ -10,8 +9,9 @@ import com.sgos.entities.OrdenServicio;
 
 public interface OrdenServicioRepository
         extends JpaRepository<OrdenServicio, Long>,
-                JpaSpecificationExecutor<OrdenServicio>  {
+                JpaSpecificationExecutor<OrdenServicio> {
 
     List<OrdenServicio> findByTecnico_Id(Long tecnicoId);
 
+    boolean existsByCliente_Id(Long clienteId);
 }

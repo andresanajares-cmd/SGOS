@@ -1,4 +1,3 @@
-
 package com.sgos.repositories;
 
 import java.util.List;
@@ -12,4 +11,6 @@ public interface SeguimientoOrdenRepository
 
     List<SeguimientoOrden>
         findByOrden_IdOrderByFechaRegistroAscIdAsc(Long ordenId);
+
+    void deleteByOrden_Id(Long ordenId);
 }

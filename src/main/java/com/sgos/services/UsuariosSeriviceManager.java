@@ -60,7 +60,7 @@ public class UsuariosSeriviceManager implements UsuariosService {
     public boolean authenticateUser(String correo, String contrasena) {
 
         Optional<Usuarios> usuarioEncontrado
-                = repository.findByCorreo(correo);
+                = repository.findByCorreo(correo.trim().toLowerCase(java.util.Locale.ROOT));
 
         if (usuarioEncontrado.isEmpty()) {
             return false;

@@ -1,4 +1,3 @@
-
 package com.sgos.services;
 
 import java.util.List;
@@ -10,14 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sgos.dto.ClienteRequest;
 import com.sgos.entities.Cliente;
 import com.sgos.repositories.ClienteRepository;
+import com.sgos.repositories.OrdenServicioRepository;
 
 @Service
 public class ClienteServiceManager implements ClienteService {
 
     private final ClienteRepository repository;
+    private final OrdenServicioRepository ordenRepository;
 
-    public ClienteServiceManager(ClienteRepository repository) {
+    public ClienteServiceManager(
+            ClienteRepository repository,
+            OrdenServicioRepository ordenRepository) {
+
         this.repository = repository;
+        this.ordenRepository = ordenRepository;
     }
 
     @Override
@@ -30,9 +35,9 @@ public class ClienteServiceManager implements ClienteService {
     @Transactional(readOnly = true)
     public Cliente buscarPorId(Long id) {
         return repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException(
-                "No existe un cliente con ID: " + id
-            ));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "No existe un cliente con ID: " + id
+                ));
     }
 
     @Override
@@ -43,7 +48,7 @@ public class ClienteServiceManager implements ClienteService {
 
         if (repository.existsByCorreo(correo)) {
             throw new IllegalArgumentException(
-                "Ya existe un cliente con ese correo"
+                    "Ya existe un cliente con ese correo"
             );
         }
 
@@ -72,7 +77,7 @@ public class ClienteServiceManager implements ClienteService {
                 && repository.existsByCorreo(correo)) {
 
             throw new IllegalArgumentException(
-                "Ya existe otro cliente con ese correo"
+                    "Ya existe otro cliente con ese correo"
             );
         }
 
@@ -89,6 +94,12 @@ public class ClienteServiceManager implements ClienteService {
     public void eliminarCliente(Long id) {
 
         Cliente cliente = buscarPorId(id);
+
+        if (ordenRepository.existsByCliente_Id(id)) {
+            throw new IllegalArgumentException(
+                    "No se puede eliminar el cliente porque tiene órdenes de servicio asociadas"
+            );
+        }
 
         repository.delete(cliente);
     }

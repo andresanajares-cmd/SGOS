@@ -16,13 +16,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.sgos.repositories.UsuariosRepository;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http,
+            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -109,14 +113,13 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/ordenesservicios/*"
                         ).hasAnyRole("ADMINISTRADOR", "TECNICO")
-                          // SEGUIMIENTOS
+                        // SEGUIMIENTOS
 
                         // Administradores y técnicos pueden consultar seguimientos
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/ordenesservicios/*/seguimientos"
                         ).hasAnyRole("ADMINISTRADOR", "TECNICO")
-
                         // Administradores y técnicos pueden registrar seguimientos
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -131,13 +134,12 @@ public class SecurityConfig {
                         ).hasAnyRole("ADMINISTRADOR", "TECNICO")
                         // OTRAS RUTAS
 
-                        
                         // de manera predeterminada, pero no se permite el acceso a ninguna otra ruta
                         .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter)
                         )
                 );
 
@@ -145,18 +147,34 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+    public JwtAuthenticationConverter jwtAuthenticationConverter(
+            UsuariosRepository usuariosRepository) {
 
         JwtAuthenticationConverter converter
                 = new JwtAuthenticationConverter();
 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
 
-            String rol = jwt.getClaimAsString("rol");
+            Long usuarioId = jwt.getClaim("usuarioId");
 
-            if (rol == null || rol.isBlank()) {
-                return List.of();
+            if (usuarioId == null) {
+                throw new InvalidBearerTokenException(
+                        "El token no contiene un identificador de usuario"
+                );
             }
+
+            var usuario = usuariosRepository.findById(usuarioId)
+                    .orElseThrow(() -> new InvalidBearerTokenException(
+                            "El usuario asociado al token no existe"
+                    ));
+
+            if (!Boolean.TRUE.equals(usuario.getActivo())) {
+                throw new InvalidBearerTokenException(
+                        "La cuenta del usuario está desactivada"
+                );
+            }
+
+            String rol = usuario.getRol().getNombre();
 
             return List.of(
                     new SimpleGrantedAuthority("ROLE_" + rol)
