@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "axios": "^1.21.1",
+    "bootstrap-icons": "^1.13.2",
+    "motion": "^14.14.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^7.18.5",
+    "sonner": "^2.0.8",
+    "sweetalert2": "^11.26.25"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
