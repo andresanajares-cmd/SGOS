@@ -53,6 +53,23 @@ const ordenService = {
 
     return response.data;
   },
+
+  obtenerSeguimientos: async (ordenId) => {
+    const response = await api.get(`/ordenesservicios/${ordenId}/seguimientos`);
+
+    return response.data;
+  },
+
+  crearSeguimiento: async (ordenId, comentario) => {
+    const response = await api.post(
+      `/ordenesservicios/${ordenId}/seguimientos`,
+      {
+        comentario: comentario.trim(),
+      },
+    );
+
+    return response.data;
+  },
 };
 
 export default ordenService;

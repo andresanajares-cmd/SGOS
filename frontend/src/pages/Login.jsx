@@ -6,7 +6,7 @@ import authService from "../services/authService";
 import "./Login.css";
 
 function Login({ onLoginSuccess }) {
-  
+
 
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
@@ -51,9 +51,8 @@ function Login({ onLoginSuccess }) {
       <div className="login-container">
         <section className="login-brand">
           <div className="login-logo">
-            <i className="bi bi-layers-half"></i>
+            <img src="/sgos-logo.png" alt="Logo SGOS" />
           </div>
-
           <h1>SGOS</h1>
           <p>Sistema Gestor de Órdenes de Servicio</p>
 
@@ -117,8 +116,8 @@ function Login({ onLoginSuccess }) {
                 >
                   <i
                     className={`bi ${mostrarContrasena
-                        ? "bi-eye-slash"
-                        : "bi-eye"
+                      ? "bi-eye-slash"
+                      : "bi-eye"
                       }`}
                   ></i>
                 </button>

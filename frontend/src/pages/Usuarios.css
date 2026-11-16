@@ -1,0 +1,350 @@
+.usuarios-page {
+  width: 100%;
+  padding: 24px;
+  font-family: "Poppins", sans-serif;
+}
+
+.usuarios-contenedor {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(6, 71, 137, 0.06);
+}
+
+.usuarios-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 30px;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.usuarios-encabezado h2 {
+  margin: 0;
+  color: #064789;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.usuarios-encabezado p {
+  margin: 6px 0 0;
+  color: #718096;
+  font-size: 13px;
+}
+
+.usuarios-filtros {
+  display: flex;
+  gap: 12px;
+  padding: 22px 30px;
+  flex-wrap: wrap;
+}
+
+.usuarios-buscador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 230px;
+  padding: 0 14px;
+  border: 1px solid #dce4ee;
+  border-radius: 9px;
+}
+
+.usuarios-buscador i {
+  color: #427aa1;
+}
+
+.usuarios-buscador input {
+  width: 100%;
+  padding: 11px 0;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13px;
+  background: transparent;
+}
+
+.usuarios-filtros select {
+  padding: 11px 14px;
+  border: 1px solid #dce4ee;
+  border-radius: 9px;
+  background: #fff;
+  color: #344054;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.usuarios-tabla-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.usuarios-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.usuarios-tabla th {
+  padding: 15px 20px;
+  background: #f7f9fc;
+  color: #667085;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usuarios-tabla td {
+  padding: 17px 20px;
+  border-bottom: 1px solid #edf0f5;
+  color: #475467;
+}
+
+.usuarios-tabla tbody tr:hover {
+  background: #fafcff;
+}
+
+.usuarios-nombre {
+  font-weight: 600;
+  color: #064789 !important;
+}
+
+.usuarios-rol,
+.usuarios-estado {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usuarios-rol-admin {
+  background: #e7effb;
+  color: #064789;
+}
+
+.usuarios-rol-tecnico {
+  background: #edf2f7;
+  color: #427aa1;
+}
+
+.usuarios-estado-activo {
+  background: #e7f7ed;
+  color: #20834a;
+}
+
+.usuarios-estado-inactivo {
+  background: #fce8e8;
+  color: #c0392b;
+}
+
+.usuarios-acciones-pendientes {
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.usuarios-mensaje {
+  text-align: center;
+  padding: 45px !important;
+  color: #98a2b3 !important;
+}
+
+.usuarios-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 30px;
+  gap: 15px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.usuarios-paginacion-controles {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.usuarios-paginacion-controles button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  background: white;
+  color: #064789;
+  cursor: pointer;
+}
+
+.usuarios-paginacion-controles button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .usuarios-page {
+    padding: 12px;
+  }
+
+  .usuarios-encabezado,
+  .usuarios-filtros,
+  .usuarios-paginacion {
+    padding: 18px;
+  }
+
+  .usuarios-filtros {
+    flex-direction: column;
+  }
+
+  .usuarios-buscador,
+  .usuarios-filtros select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .usuarios-paginacion {
+    flex-wrap: wrap;
+  }
+}
+
+/* Acciones de usuarios */
+
+.usuarios-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usuarios-btn-rol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  background: #ebf2fa;
+  color: #064789;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.usuarios-btn-rol:hover {
+  background: #064789;
+  color: white;
+  border-color: #064789;
+}
+
+.usuarios-btn-rol i {
+  font-size: 16px;
+}
+
+/* Activar y desactivar usuarios */
+
+.usuarios-btn-estado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.usuarios-btn-estado i {
+  font-size: 16px;
+}
+
+.usuarios-btn-desactivar {
+  background: #fce8e8;
+  color: #c0392b;
+  border-color: #f5d0d0;
+}
+
+.usuarios-btn-desactivar:hover {
+  background: #c0392b;
+  color: white;
+}
+
+.usuarios-btn-activar {
+  background: #e7f7ed;
+  color: #20834a;
+  border-color: #ccebd7;
+}
+
+.usuarios-btn-activar:hover {
+  background: #20834a;
+  color: white;
+}
+
+/* Botón registrar técnico */
+
+.usuarios-btn-crear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #064789;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.usuarios-btn-crear:hover {
+  background: #427aa1;
+}
+
+.usuarios-btn-crear i {
+  font-size: 16px;
+}
+
+@media (max-width: 576px) {
+  .usuarios-encabezado {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .usuarios-btn-crear {
+    width: 100%;
+  }
+}
+
+/* Botón para visualizar detalles */
+
+.usuarios-btn-detalle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d5e4f2;
+  border-radius: 8px;
+  background: #ebf2fa;
+  color: #427aa1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.usuarios-btn-detalle:hover {
+  background: #427aa1;
+  color: white;
+  border-color: #427aa1;
+}
+
+.usuarios-btn-detalle i {
+  font-size: 16px;
+}

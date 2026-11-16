@@ -1,0 +1,455 @@
+/* =========================================
+   PÁGINA DE CLIENTES
+========================================= */
+
+.clientes-page {
+  width: 100%;
+  font-family: "Poppins", sans-serif;
+}
+
+/* =========================================
+   CONTENEDOR PRINCIPAL
+========================================= */
+
+.clientes-contenedor {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5eaf0;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+/* =========================================
+   ENCABEZADO
+========================================= */
+
+.clientes-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px 32px;
+  margin: 0;
+  border-bottom: 1px solid #e5eaf0;
+}
+
+.clientes-encabezado h1 {
+  margin: 0;
+  color: #064789;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.clientes-encabezado p {
+  margin: 7px 0 0;
+  color: #7187a8;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   BOTÓN NUEVO CLIENTE
+========================================= */
+
+.clientes-boton-nuevo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 12px;
+  background: #064789;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.clientes-boton-nuevo:hover:not(:disabled) {
+  background: #0a5ca8;
+  transform: translateY(-1px);
+}
+
+.clientes-boton-nuevo:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.clientes-boton-nuevo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.clientes-busqueda {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 32px 18px;
+  padding: 16px 18px;
+  background: #f4f8fc;
+  border: 1px solid #d9e5f3;
+  border-radius: 14px;
+  color: #427aa1;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.clientes-busqueda:focus-within {
+  border-color: #427aa1;
+  box-shadow: 0 0 0 3px rgba(66, 122, 161, 0.1);
+}
+
+.clientes-busqueda i {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.clientes-busqueda input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #334155;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.clientes-busqueda input::placeholder {
+  color: #94a3b8;
+}
+
+/* =========================================
+   ENCABEZADO DEL LISTADO
+========================================= */
+
+.clientes-tabla-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 32px 20px;
+  border-bottom: none;
+}
+
+.clientes-tabla-encabezado h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #064789;
+}
+
+.clientes-tabla-encabezado span {
+  font-size: 12px;
+  color: #7187a8;
+}
+
+/* =========================================
+   CONTENEDOR DE TABLA
+========================================= */
+
+.clientes-tabla-contenedor {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b8c9da transparent;
+}
+
+.clientes-tabla-contenedor::-webkit-scrollbar {
+  height: 6px;
+}
+
+.clientes-tabla-contenedor::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.clientes-tabla-contenedor::-webkit-scrollbar-thumb {
+  background: #b8c9da;
+  border-radius: 10px;
+}
+
+/* =========================================
+   TABLA DE CLIENTES
+========================================= */
+
+.clientes-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.clientes-tabla th {
+  padding: 20px 24px;
+  background: #f1f6fc;
+  color: #427aa1;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.clientes-tabla td {
+  padding: 20px 24px;
+  border-top: 1px solid #eef2f6;
+  color: #334155;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.clientes-tabla tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.clientes-tabla tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* =========================================
+   BOTONES DE ACCIONES
+========================================= */
+
+.clientes-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clientes-acciones button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid #e5eaf0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #427aa1;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.clientes-acciones button:hover:not(:disabled) {
+  background: #ebf2fa;
+  border-color: #b8c9da;
+}
+
+.clientes-acciones button:focus-visible {
+  outline: 2px solid #427aa1;
+  outline-offset: 2px;
+}
+
+.clientes-acciones button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   MENSAJES DE ESTADO
+========================================= */
+
+.clientes-mensaje {
+  padding: 45px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.clientes-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 18px 32px;
+  border-top: 1px solid #e5eaf0;
+}
+
+.clientes-paginacion > span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.clientes-paginacion-botones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clientes-paginacion-botones button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border: 1px solid #dbe4ed;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #064789;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.clientes-paginacion-botones button:hover:not(:disabled) {
+  background: #ebf2fa;
+  border-color: #b8c9da;
+}
+
+.clientes-paginacion-botones button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   RESPONSIVE - TABLETS
+========================================= */
+
+@media (max-width: 768px) {
+  .clientes-encabezado {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 24px 20px;
+  }
+
+  .clientes-encabezado h1 {
+    font-size: 19px;
+  }
+
+  .clientes-boton-nuevo {
+    width: 100%;
+  }
+
+  .clientes-busqueda {
+    margin: 20px 20px 16px;
+  }
+
+  .clientes-tabla-encabezado {
+    padding: 0 20px 18px;
+  }
+
+  .clientes-tabla th,
+  .clientes-tabla td {
+    padding: 15px 16px;
+  }
+
+  .clientes-paginacion {
+    padding: 16px 20px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - CELULARES
+========================================= */
+
+@media (max-width: 600px) {
+  .clientes-contenedor {
+    border-radius: 16px;
+  }
+
+  .clientes-encabezado {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .clientes-encabezado h1 {
+    font-size: 18px;
+  }
+
+  .clientes-encabezado p {
+    font-size: 12px;
+  }
+
+  .clientes-boton-nuevo {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  .clientes-busqueda {
+    margin: 16px;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .clientes-busqueda input {
+    font-size: 12px;
+  }
+
+  .clientes-tabla-encabezado {
+    padding: 0 16px 16px;
+    flex-wrap: wrap;
+  }
+
+  .clientes-tabla-encabezado h2 {
+    font-size: 13px;
+  }
+
+  .clientes-tabla th,
+  .clientes-tabla td {
+    padding: 14px 12px;
+    font-size: 11px;
+  }
+
+  .clientes-acciones {
+    gap: 6px;
+  }
+
+  .clientes-acciones button {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .clientes-paginacion {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .clientes-paginacion-botones {
+    justify-content: space-between;
+  }
+
+  .clientes-paginacion-botones button {
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+}
+
+/* =========================================
+   ACCESIBILIDAD - MOVIMIENTO REDUCIDO
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .clientes-boton-nuevo,
+  .clientes-busqueda,
+  .clientes-tabla tbody tr,
+  .clientes-acciones button,
+  .clientes-paginacion-botones button {
+    transition: none;
+  }
+}

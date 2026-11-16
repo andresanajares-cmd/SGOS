@@ -7,7 +7,7 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-
+import Usuarios from "./pages/Usuarios";
 import { Toaster } from "sonner";
 
 import DashboardLayout from "./components/DashboardLayout";
@@ -16,17 +16,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Inicio from "./pages/Inicio";
 import Login from "./pages/Login";
 import Solicitudes from "./pages/Solicitudes";
+import Clientes from "./pages/Clientes";
 
 import authService from "./services/authService";
 
-function PaginaProvisional({ titulo }) {
-  return (
-    <div>
-      <h1>{titulo}</h1>
-      <p>Esta sección se encuentra en desarrollo.</p>
-    </div>
-  );
-}
+
 
 function RutasAplicacion() {
   const navigate = useNavigate();
@@ -76,24 +70,12 @@ function RutasAplicacion() {
 
           <Route
             path="clientes"
-            element={
-              <PaginaProvisional titulo="Clientes" />
-            }
+            element={<Clientes />}
           />
 
-          <Route
-            path="usuarios"
-            element={
-              <PaginaProvisional titulo="Usuarios" />
-            }
-          />
+          <Route path="/usuarios" element={<Usuarios />} />
 
-          <Route
-            path="catalogos"
-            element={
-              <PaginaProvisional titulo="Catálogos" />
-            }
-          />
+         
         </Route>
       </Route>
 

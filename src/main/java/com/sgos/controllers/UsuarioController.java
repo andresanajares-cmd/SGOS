@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.sgos.dto.CambiarEstadoRequest;
+import com.sgos.dto.CambiarRolRequest;
 import com.sgos.dto.CrearUsuarioRequest;
 import com.sgos.dto.LoginRequest;
 import com.sgos.dto.LoginResponse;
@@ -150,6 +151,36 @@ public class UsuarioController {
 
         return ResponseEntity.ok(
                 convertirAResponse(actualizado)
+        );
+    }
+
+    @PatchMapping("/{id}/rol")
+    public ResponseEntity<UsuarioResponse> cambiarRol(
+            @PathVariable Long id,
+            @Valid @RequestBody CambiarRolRequest request,
+            Authentication authentication) {
+
+        // Obtener el administrador autenticado
+        String correoAdministrador = authentication.getName();
+
+        Usuarios administrador = usuariosRepository
+                .findByCorreo(correoAdministrador.trim()
+                        .toLowerCase(java.util.Locale.ROOT))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "No se encontró el administrador autenticado"
+                ));
+
+        // Realizar el cambio de rol
+        Usuarios usuarioActualizado = usuarioService.cambiarRol(
+                id,
+                request,
+                administrador.getId()
+        );
+
+        // Devolver los datos actualizados
+        return ResponseEntity.ok(
+                convertirAResponse(usuarioActualizado)
         );
     }
 

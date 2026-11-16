@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.sgos.dto.CambiarRolRequest;
 import com.sgos.dto.CrearUsuarioRequest;
 import com.sgos.entities.Rol;
 import com.sgos.entities.Usuarios;
@@ -122,12 +124,105 @@ public class UsuariosSeriviceManager implements UsuariosService {
     }
 
     @Override
+    @Transactional
     public Usuarios cambiarEstado(Long id, boolean activo) {
 
         Usuarios usuario = buscarPorId(id);
 
+        if (!activo
+                && Boolean.TRUE.equals(usuario.getActivo())
+                && "ADMINISTRADOR".equals(
+                        usuario.getRol().getNombre())) {
+
+            long administradoresActivos = repository.findAll()
+                    .stream()
+                    .filter(u -> Boolean.TRUE.equals(u.getActivo()))
+                    .filter(u -> "ADMINISTRADOR".equals(
+                            u.getRol().getNombre()))
+                    .count();
+
+            if (administradoresActivos <= 1) {
+                throw new IllegalArgumentException(
+                        "No se puede desactivar al último administrador activo"
+                );
+            }
+        }
+
         usuario.setActivo(activo);
 
+        return repository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public Usuarios cambiarRol(
+            Long id,
+            CambiarRolRequest request,
+            Long administradorId) {
+
+        // Buscar el usuario que realizará el cambio
+        Usuarios administrador = buscarPorId(administradorId);
+
+        // Verificar que sea un administrador activo
+        if (!Boolean.TRUE.equals(administrador.getActivo())
+                || !administrador.getRol().getNombre()
+                        .equals("ADMINISTRADOR")) {
+
+            throw new IllegalArgumentException(
+                    "No tienes permisos para cambiar roles"
+            );
+        }
+
+        // Buscar el usuario cuyo rol se modificará
+        Usuarios usuario = buscarPorId(id);
+
+        // Impedir que el administrador cambie su propio rol
+        if (usuario.getId().equals(administradorId)) {
+            throw new IllegalArgumentException(
+                    "No puedes cambiar tu propio rol"
+            );
+        }
+
+        // Buscar el nuevo rol en la base de datos
+        Rol nuevoRol = rolRepository
+                .findByNombre(request.rol())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El rol solicitado no existe"
+                ));
+
+        String rolActual = usuario.getRol().getNombre();
+        String rolSolicitado = nuevoRol.getNombre();
+
+        // Evitar cambios innecesarios
+        if (rolActual.equals(rolSolicitado)) {
+            throw new IllegalArgumentException(
+                    "El usuario ya tiene asignado ese rol"
+            );
+        }
+
+        // Verificar si se está degradando a un administrador
+        if (rolActual.equals("ADMINISTRADOR")
+                && rolSolicitado.equals("TECNICO")
+                && Boolean.TRUE.equals(usuario.getActivo())) {
+
+            long administradoresActivos = repository.findAll()
+                    .stream()
+                    .filter(u -> Boolean.TRUE.equals(u.getActivo()))
+                    .filter(u -> u.getRol().getNombre()
+                            .equals("ADMINISTRADOR"))
+                    .count();
+
+            if (administradoresActivos <= 1) {
+                throw new IllegalArgumentException(
+                        "No puedes cambiar el rol del último administrador activo"
+                );
+            }
+        }
+
+        // Asignar el nuevo rol
+        usuario.setRol(nuevoRol);
+
+        // Guardar los cambios
         return repository.save(usuario);
     }
 

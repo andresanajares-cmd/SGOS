@@ -35,40 +35,31 @@ const opcionesMenu = [
     ruta: "/usuarios",
     icono: "bi-person-gear",
     nombre: "Usuarios y roles",
-  },
-  {
-    ruta: "/catalogos",
-    icono: "bi-collection-fill",
-    nombre: "Catálogos",
-  },
+  }
+
 ];
 
 const informacionPaginas = {
   "/": {
-    titulo: "Resumen general",
+    titulo: "Sistema Gestor de Órdenes de Servicio",
     descripcion:
       "Consulta el estado de las órdenes de servicio y las actividades del sistema.",
   },
   "/solicitudes": {
-    titulo: "Solicitudes",
+    titulo: "Sistema Gestor de Órdenes de Servicio",
     descripcion:
       "Gestiona y consulta las órdenes de servicio registradas.",
   },
   "/clientes": {
-    titulo: "Clientes",
+    titulo: "Sistema Gestor de Órdenes de Servicio",
     descripcion:
       "Administra la información de los clientes del sistema.",
   },
   "/usuarios": {
-    titulo: "Usuarios y roles",
+    titulo: "Sistema Gestor de Órdenes de Servicio",
     descripcion:
       "Gestiona los usuarios y sus roles dentro de SGOS.",
-  },
-  "/catalogos": {
-    titulo: "Catálogos",
-    descripcion:
-      "Consulta y administra los datos de referencia del sistema.",
-  },
+  }
 };
 
 function DashboardLayout({ onLogout }) {
@@ -113,13 +104,15 @@ function DashboardLayout({ onLogout }) {
       >
         <div className="sidebar-top">
           <div className="sidebar-logo">
-            <div className="logo-placeholder">
-              <i className="bi bi-layers-half"></i>
-            </div>
+            
+              <img
+                src="/sgos-logo.png"
+                alt="Logo SGOS"
+                className="dashboard-logo"
+              />
+            
 
-            <span className="sidebar-logo-text">
-              Espacio para logo
-            </span>
+            
           </div>
 
           <button
