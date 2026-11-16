@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Inicio from "./pages/Inicio";
 import Login from "./pages/Login";
+import Solicitudes from "./pages/Solicitudes";
 
 import authService from "./services/authService";
 
@@ -58,7 +59,9 @@ function RutasAplicacion() {
         }
       />
 
-      <Route element={<ProtectedRoute autenticado={autenticado} />}>
+      <Route
+        element={<ProtectedRoute autenticado={autenticado} />}
+      >
         <Route
           element={
             <DashboardLayout onLogout={cerrarSesion} />
@@ -68,22 +71,28 @@ function RutasAplicacion() {
 
           <Route
             path="solicitudes"
-            element={<PaginaProvisional titulo="Solicitudes" />}
+            element={<Solicitudes />}
           />
 
           <Route
             path="clientes"
-            element={<PaginaProvisional titulo="Clientes" />}
+            element={
+              <PaginaProvisional titulo="Clientes" />
+            }
           />
 
           <Route
             path="usuarios"
-            element={<PaginaProvisional titulo="Usuarios" />}
+            element={
+              <PaginaProvisional titulo="Usuarios" />
+            }
           />
 
           <Route
             path="catalogos"
-            element={<PaginaProvisional titulo="Catálogos" />}
+            element={
+              <PaginaProvisional titulo="Catálogos" />
+            }
           />
         </Route>
       </Route>

@@ -1,0 +1,241 @@
+
+/* FONDO DEL MODAL */
+
+.detalle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(9, 31, 55, 0.48);
+  backdrop-filter: blur(4px);
+  box-sizing: border-box;
+}
+
+/* CONTENEDOR */
+
+.detalle-modal {
+  width: 100%;
+  max-width: 590px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0e9f3;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(6, 71, 137, 0.16);
+  font-family: "Poppins", sans-serif;
+}
+
+/* ENCABEZADO */
+
+.detalle-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 24px 26px;
+  border-bottom: 1px solid #e7edf5;
+}
+
+.detalle-encabezado-info {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.detalle-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: #ebf2fa;
+  border-radius: 12px;
+  color: #064789;
+  font-size: 21px;
+}
+
+.detalle-encabezado h2 {
+  margin: 0 0 5px;
+  color: #064789;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.detalle-encabezado p {
+  margin: 0;
+  color: #71849a;
+  font-size: 11px;
+}
+
+.detalle-cerrar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
+  background: #f2f6fa;
+  color: #71849a;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.detalle-cerrar:hover {
+  background: #e5edf6;
+  color: #064789;
+}
+
+/* CONTENIDO */
+
+.detalle-contenido {
+  padding: 24px 26px;
+}
+
+.detalle-etiqueta {
+  display: block;
+  margin-bottom: 7px;
+  color: #71849a;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.detalle-estado-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e7edf5;
+}
+
+.detalle-estado-fila .detalle-etiqueta {
+  margin-bottom: 0;
+}
+
+.detalle-descripcion {
+  padding: 22px 0;
+  border-bottom: 1px solid #e7edf5;
+}
+
+.detalle-descripcion p {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+/* INFORMACIÓN EN CUADRÍCULA */
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 24px;
+}
+
+.detalle-campo {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+}
+
+.detalle-campo-icono {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ebf2fa;
+  border-radius: 10px;
+  color: #427aa1;
+  font-size: 15px;
+}
+
+.detalle-campo > div:last-child {
+  min-width: 0;
+}
+
+.detalle-campo p {
+  margin: 0;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+/* PIE DEL MODAL */
+
+.detalle-pie {
+  display: flex;
+  justify-content: flex-end;
+  padding: 17px 26px;
+  border-top: 1px solid #e7edf5;
+  background: #fbfdff;
+}
+
+.detalle-boton-cerrar {
+  padding: 11px 24px;
+  border: none;
+  border-radius: 10px;
+  background: #064789;
+  color: white;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.detalle-boton-cerrar:hover {
+  background: #427aa1;
+}
+
+.detalle-cerrar:focus-visible,
+.detalle-boton-cerrar:focus-visible {
+  outline: 2px solid #427aa1;
+  outline-offset: 3px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .detalle-overlay {
+    padding: 12px;
+  }
+
+  .detalle-modal {
+    max-height: calc(100dvh - 24px);
+    border-radius: 16px;
+  }
+
+  .detalle-encabezado,
+  .detalle-contenido {
+    padding: 20px 18px;
+  }
+
+  .detalle-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .detalle-pie {
+    padding: 15px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detalle-cerrar,
+  .detalle-boton-cerrar {
+    transition: none;
+  }
+}
